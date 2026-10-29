@@ -49,3 +49,11 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\viewer\Build-Viewer.ps
 ~~~
 
 -CopyToAgent 只写本项目 dist/DM-Agent-x64/viewer。查看器源码、已组装 HTML 和第三方许可应随版本控制保存；.tools、out 和根 dist 是本地生成目录。
+
+## GitHub Actions 与 Release
+
+[Windows build and release](../.github/workflows/release.yml) 在 main 更新或手动触发时构建 Windows x64 便携包，在推送版本标签时构建并发布 GitHub Release。标签格式为 v0.1.0，必须与 CMakeLists.txt 版本一致，并提供对应的 docs/releases/v0.1.0.md 发布说明。
+
+在线构建通过 [Build-HostedRelease.ps1](../tools/Build-HostedRelease.ps1) 使用 windows-2022 托管环境预装的 Visual Studio 2022 和 CMake，按 Release 配置编译并静态链接 CRT。此入口专用于 GitHub Actions；本地构建继续使用前述项目内工具链。托管环境随 GitHub 镜像维护更新，其镜像版本、源码提交和构建链接记录在便携包 BUILD-INFO.json。
+
+流水线组装查看器、编译、安装并检查文件、可执行文件架构和版本，随后生成 SegotepDM-v0.1.0-windows-x64.zip 与 SHA256SUMS.txt。标签构建成功后，发布任务校验 ZIP 哈希并将文件附加到 Release。编译产物可在 Actions 中下载，保留 14 天；正式发布附件保存在 Releases。

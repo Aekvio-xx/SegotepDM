@@ -27,5 +27,5 @@ install(FILES docs/PORTABLE_README.txt DESTINATION . RENAME README.txt)
 install(FILES LICENSE DESTINATION .)
 install(FILES docs/USAGE.md docs/IPC.md docs/ENERGY.md docs/PROTOCOL.md docs/THIRD_PARTY.md DESTINATION docs)
 install(FILES third_party/nlohmann/LICENSE.MIT DESTINATION licenses RENAME nlohmann-json-LICENSE.MIT)
-install(FILES viewer/dist/DM-Record-Viewer.html viewer/USAGE.md DESTINATION viewer)
+install(FILES viewer/dist/DM-Record-Viewer.html viewer/dist/build-manifest.json viewer/USAGE.md DESTINATION viewer)
 # Build/install only. No application, browser, device or test is launched.

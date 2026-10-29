@@ -15,7 +15,7 @@ DM Agent 是面向 Windows x64 的鑫谷 DM 数字电源本地监测程序，理
 
 源码包附带可直接打开的 [DM-Record-Viewer.html](viewer/dist/DM-Record-Viewer.html)。 Edge／Chrome 打开后，选择或拖入 CSV／日志。两个页签各自保留导入与筛选状态，文件只在浏览器内存中处理。
 
-Agent 需要先构建。构建完成后运行 dist/DM-Agent-x64/DmTelemetryAgent.exe，首次选择电源对应端口。HIMOS等其它应用不能同时占用端口。关闭主窗口隐藏到托盘；退出请使用托盘菜单。
+从 [Releases](https://github.com/Aekvio-xx/SegotepDM/releases/latest) 下载 Windows x64 便携 ZIP，解压后运行 DM-Agent-x64/DmTelemetryAgent.exe；从源码构建时，程序输出到 dist/DM-Agent-x64。首次选择电源对应端口。HIMOS等其它应用不能同时占用端口。关闭主窗口隐藏到托盘；退出请使用托盘菜单。
 
 [使用说明](docs/USAGE.md)介绍连接、后台运行、数据目录和状态；[查看器说明](viewer/USAGE.md)介绍导入、筛选、图表与导出。
 
