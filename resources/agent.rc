@@ -1,0 +1,25 @@
+#pragma code_page(65001)
+#include <windows.h>
+101 ICON "dm-agent.ico"
+1 RT_MANIFEST "agent.manifest"
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,1,0,0
+ PRODUCTVERSION 0,1,0,0
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+BEGIN
+ BLOCK "StringFileInfo"
+ BEGIN
+  BLOCK "080404B0"
+  BEGIN
+   VALUE "FileDescription", "鑫谷 DM 本地遥测代理\0"
+   VALUE "ProductName", "Segotep DM Telemetry Agent\0"
+   VALUE "FileVersion", "0.1.0\0"
+   VALUE "OriginalFilename", "DmTelemetryAgent.exe\0"
+  END
+ END
+ BLOCK "VarFileInfo"
+ BEGIN
+  VALUE "Translation", 0x0804, 1200
+ END
+END

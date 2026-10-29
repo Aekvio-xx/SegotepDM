@@ -1,0 +1,1832 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="color-scheme" content="light">
+<title>DM 记录查看器 · CSV 与运行日志</title>
+<style>
+:root{color-scheme:light;--bg:#f3f5f7;--panel:#fff;--ink:#1c2d37;--muted:#647780;--line:#e0e7eb;--accent:#16756f;--accent-soft:#e8f3f1;--warn:#a66b27;--error:#b5524f;--radius:13px;--shadow:0 2px 5px #20354104;font:14px/1.55 "Segoe UI","Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}button,input,select,textarea{font:inherit}button,a,input,select,summary,[tabindex]{-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}a{color:var(--accent);text-decoration:none}button{cursor:pointer}button:disabled,select:disabled,input:disabled{opacity:.48;cursor:not-allowed}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #16756f66;outline-offset:3px}[hidden]{display:none!important}h1,h2,h3,p{margin-top:0}ul{padding-left:20px}.app-shell{display:grid;grid-template-columns:214px minmax(0,1fr);min-height:100vh}.sidebar{padding:27px 20px 22px;background:#f9fafb;border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:25px}.brand{display:flex;align-items:center;gap:11px;color:var(--ink);font-weight:650;line-height:1.4}.brand-mark{display:inline-flex;align-items:center;justify-content:center;width:39px;height:39px;border-radius:11px;flex:none;background:#293d46;color:#fff;font-size:14px;letter-spacing:.5px;font-weight:700}.brand-caption{display:block;margin-top:3px;font-size:11px;color:var(--muted);font-weight:400;letter-spacing:.3px}.nav{display:flex;flex-direction:column;gap:6px}.nav-link{padding:10px 12px;border-radius:8px;color:#657680;font-size:13px;display:block;font-weight:550}.nav-link:hover{background:#eef2f4;color:var(--ink)}.nav-link.is-active{color:var(--accent);background:var(--accent-soft);box-shadow:inset 3px 0 var(--accent)}.sidebar-section{border-top:1px solid var(--line);padding-top:20px}.sidebar-section h2{margin:0 0 7px;font-size:12px;font-weight:650}.sidebar-note{margin:auto 0 0;color:#6c7d87;font-size:11px;line-height:1.85}.file-list{list-style:none;margin:10px 0 0;padding:0;max-height:43vh;overflow:auto}.file-item{margin:0 0 10px;padding:9px 10px;background:#fff;border:1px solid #e7ecef;border-radius:8px;overflow-wrap:anywhere;font-size:11px;line-height:1.65}.file-item strong{font-weight:600;font-size:11px}.file-item p{margin:2px 0}.main{padding:28px clamp(18px,3vw,42px) 24px;min-width:0;max-width:1650px;width:100%;margin:0 auto}.topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:20px}.eyebrow{font-size:11px;font-weight:650;letter-spacing:1.6px;color:#87949e;margin:0 0 5px}.page-title{font-size:27px;font-weight:680;letter-spacing:-.6px;line-height:1.35;margin:0 0 6px}.lede{font-size:13px;color:var(--muted);margin:0}.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:35px;padding:7px 13px;border:1px solid #d8e1e6;border-radius:7px;background:#fff;color:#455b68;font-size:12px;font-weight:550;white-space:nowrap;line-height:1.4;transition:background .12s,border-color .12s}.button:hover:not(:disabled){background:#f1f6f7;border-color:#bacbd3}.button.primary{background:var(--accent);border-color:var(--accent);color:#fff;padding-inline:17px}.button.primary:hover:not(:disabled){background:#105f5a;border-color:#105f5a}.button.quiet{background:transparent}.button.danger{color:var(--error)}.import-zone{border:1px dashed #bacfd0;background:linear-gradient(110deg,#f8fcfb,#fff);border-radius:11px;padding:17px 20px;display:flex;flex-direction:column;gap:4px;margin-bottom:17px;cursor:pointer;transition:border-color .12s,background .12s}.import-zone strong{font-size:13px;font-weight:600;color:#3b635f}.import-zone p{margin:0;font-size:12px;color:var(--muted)}.import-zone.is-dragover{background:#e3f2ee;border:1px solid var(--accent)}.filters{display:flex;align-items:flex-end;gap:11px 12px;flex-wrap:wrap;padding:15px 17px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:8px}.field{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:100px;font-size:11px;color:#7a8993;line-height:1.4}.field-wide{flex:1;min-width:155px}.field input,.field select{width:100%;min-width:0}.field.small{font-size:11px;min-width:90px}input:not([type=checkbox]):not([type=file]),select{height:35px;border:1px solid #dce4e9;border-radius:6px;padding:6px 9px;background:#fff;color:#3c515e;font-size:12px;max-width:100%}input[type=datetime-local]{min-width:177px}select{padding-right:23px;max-width:270px}input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;flex:none;margin:0 5px 0 0}.check{display:inline-flex;align-items:center;font-size:11px;color:#687985;line-height:1.7}.help{font-size:11px;line-height:1.8;color:#6c7d87;margin:8px 0 16px}.muted{color:var(--muted)}.small{font-size:12px}.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:17px 0 12px}.stat-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:17px 19px 14px;box-shadow:var(--shadow);min-width:0}.stat-label{font-size:11px;color:#637782;margin:0 0 8px;font-weight:500}.stat-value{font-size:28px;line-height:1.3;letter-spacing:-.8px;font-weight:650;color:#27434e;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.stat-unit{font-size:12px;color:#81909a;font-weight:500}.stat-meta{font-size:11px;color:#71828c;margin:7px 0 0;line-height:1.6}.chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px;margin:17px 0}.card{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 20px 16px;box-shadow:var(--shadow)}section.card{margin-top:17px}.chart-grid>.card{margin-top:0}.span-2{grid-column:span 2}.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:13px;margin-bottom:11px;min-width:0}.card-title{font-size:14px;font-weight:650;line-height:1.6;margin:0;color:#334e5b}.card-subtitle{font-size:11px;color:#71828c;line-height:1.8;margin:3px 0 0}.card-head .field{min-width:95px;max-width:170px}.card-head .actions .field{max-width:220px}.chart-host{min-width:0}.chart-legend{display:flex;gap:9px 15px;align-items:center;flex-wrap:wrap;min-height:21px;margin:3px 0 2px;font-size:11px;color:#778792}.chart-legend:empty{min-height:0;margin:0}.chart-legend span{display:inline-flex;align-items:center;gap:5px}.chart-legend i{display:inline-block;flex:none;width:7px;height:7px;border-radius:50%}.plot-wrap{position:relative;width:100%;height:232px}.chart-tall .plot-wrap{height:275px}.chart-host.is-timeline .plot-wrap{height:96px}.plot-wrap canvas{display:block;max-width:100%}.plot-tooltip{position:absolute;z-index:4;max-width:310px;pointer-events:none;background:#213843f2;color:#f1f6f8;border-radius:7px;padding:10px 12px;box-shadow:0 5px 16px #13252d22;font-size:11px;line-height:1.8;white-space:pre-line;overflow-wrap:anywhere}.plot-tooltip strong{display:block;font-weight:600;color:#fff;margin-bottom:3px}.notice{border:1px solid #d3e6e4;border-radius:8px;background:#eef7f5;padding:11px 14px;color:#42746b;font-size:12px;line-height:1.8;margin:12px 0;white-space:pre-line;overflow-wrap:anywhere}.notice.warn{background:#fcf7ee;color:#96713b;border-color:#eadcc5}.notice.error{background:#fcf1ef;color:#aa615d;border-color:#ead4d1}.empty-state{text-align:center;color:#8897a1;font-size:12px;padding:35px 20px}.table-wrap{overflow:auto;max-width:100%;border:1px solid #e6ecef;border-radius:8px}.data-table{width:100%;border-collapse:collapse;text-align:left;font-size:11px;line-height:1.6;font-variant-numeric:tabular-nums}.data-table th{background:#f8fafb;color:#80909a;font-weight:500;white-space:nowrap;position:sticky;top:0;z-index:1;padding:11px 12px;border-bottom:1px solid #e4ebef}.data-table td{padding:11px 12px;vertical-align:top;border-bottom:1px solid #edf1f3;color:#536975}.data-table tbody tr:last-child td{border-bottom:0}.data-table tbody tr:hover{background:#fafcfc}.data-table td:first-child{white-space:nowrap}.data-table td .button{min-height:26px;padding:4px 8px;font-size:11px}.data-table td .badge{margin:0 3px 4px 0}.metric-table td{white-space:nowrap}.badge{display:inline-flex;align-items:center;max-width:100%;padding:2px 6px;border-radius:5px;background:#eff3f5;color:#7c8b95;font-size:11px;line-height:1.6;white-space:nowrap}.badge-ok{background:#e9f3ef;color:#4b8274}.badge-warn{background:#faf0e1;color:#a07942}.badge-error{background:#f9e8e5;color:#aa6862}.pagination{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:13px;font-size:11px;flex-wrap:wrap}.pagination .field{min-width:90px;flex-direction:row;align-items:center}.pagination .field select{width:auto;height:30px;max-width:125px;font-size:11px}.pagination>.actions:first-child{margin-right:auto}.details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.footer-note{font-size:11px;line-height:1.8;color:#74858f;margin:20px 0 0}.legend-text{font-size:11px;color:var(--muted)}summary{cursor:pointer;color:#627782;font-weight:500}details.card{padding:16px 20px}details.card summary{font-size:12px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}dialog{box-shadow:0 20px 80px #182d3930}dialog:focus-visible{outline:0}progress{width:100%;accent-color:var(--accent)}@media(min-width:1700px){.main{padding-top:34px}.plot-wrap{height:260px}.chart-tall .plot-wrap{height:310px}}@media(max-width:1100px){.app-shell{grid-template-columns:185px minmax(0,1fr)}.sidebar{padding:25px 15px}.main{padding:25px 20px}.stats-grid{gap:10px}.stat-card{padding:14px}.stat-value{font-size:25px}.card{padding:17px}.card-head{flex-wrap:wrap}.field-wide{min-width:140px}}@media(max-width:820px){.app-shell{display:block}.sidebar{position:static;display:flex;flex-flow:row wrap;align-items:center;gap:12px 20px;height:auto;padding:15px 20px;border-right:0;border-bottom:1px solid var(--line)}.brand{flex:1}.brand-mark{height:32px;width:32px;border-radius:8px}.sidebar .nav{flex-direction:row}.nav-link{padding:8px 10px;font-size:12px}.sidebar .sidebar-section{width:100%;padding-top:10px;margin:0}.sidebar .sidebar-section .file-list{max-height:110px;display:flex;gap:8px;flex-wrap:wrap;margin:5px 0 0}.sidebar .sidebar-section .file-item{margin:0;padding:6px 8px;max-width:250px}.sidebar-note{display:none}.main{padding:22px 18px}.page-title{font-size:24px}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.chart-grid{grid-template-columns:1fr}.span-2{grid-column:auto}.chart-host .plot-wrap{height:245px}.chart-host.chart-tall .plot-wrap{height:260px}.chart-host.is-timeline .plot-wrap{height:96px}.filters .field{flex:1;min-width:150px}.filters .field select{max-width:none}.card-head>.actions{width:100%}}@media(max-width:520px){.sidebar{padding:13px 14px}.brand-caption{display:none}.sidebar .nav{width:100%}.sidebar .sidebar-section{display:none}.main{padding:18px 12px}.topbar{align-items:flex-start;flex-direction:column;gap:14px}.topbar>.actions{width:100%}.topbar>.actions .primary{flex:1}.page-title{font-size:23px}.lede{font-size:12px}.import-zone{padding:15px}.stats-grid{gap:8px}.stat-card{padding:13px}.stat-value{font-size:24px}.stat-label{font-size:11px}.filters{padding:13px;gap:11px}.filters .field{min-width:135px}.filters input[type=datetime-local]{min-width:0}.chart-grid{gap:12px}.card{padding:16px 12px}.card-title{font-size:13px}.card-subtitle{font-size:11px}.chart-host .plot-wrap{height:225px}.plot-tooltip{max-width:250px}.data-table th,.data-table td{padding:9px}.pagination{justify-content:flex-start}.footer-note{font-size:11px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+</style>
+<style>
+.nav-link[role=tab]{width:100%;border:0;background:transparent;text-align:left;font-family:inherit;cursor:pointer}
+.nav-link[role=tab].is-active{color:var(--accent);background:var(--accent-soft)}
+.nav-link[role=tab]:hover:not(.is-active){background:#eef2f4;color:var(--ink)}
+.source-panel{display:contents}
+@media(max-width:820px){.nav-link[role=tab]{width:auto}}
+</style>
+<style>
+.csv-range-actions{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.csv-record-note{max-width:75ch}
+.csv-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 20px}.csv-facts div{min-width:0}.csv-facts dt{color:var(--muted,#65717d);font-size:12px}.csv-facts dd{margin:4px 0 0;overflow-wrap:anywhere;font-size:13px}
+.csv-dialog{width:min(900px,calc(100vw - 40px));max-height:85vh;border:1px solid #dbe1e5;border-radius:16px;padding:24px;color:#17212b;background:#fff}.csv-dialog::backdrop{background:#14242b70}.csv-dialog-head{display:flex;justify-content:space-between;align-items:start;gap:16px;margin-bottom:20px}.csv-dialog h2{margin:0;font-size:20px}
+.csv-import-diagnostics{padding:16px 20px;margin:12px 0;background:#fff;border:1px solid #e0e5e8;border-radius:12px}.csv-import-diagnostics ul{max-height:220px;overflow:auto;padding-left:20px;font-size:13px;line-height:1.8}.csv-quality{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.csv-top-help{font-size:12px;line-height:1.7;max-width:75ch}.csv-compact-select{max-width:160px}.csv-file-meta{display:block;font-size:11px;color:#74808a;margin-top:3px}.csv-empty-cell{text-align:center;padding:30px!important;color:#74808a}.csv-dialog .table-wrap{max-height:45vh}.csv-stat-value-row{display:flex;align-items:baseline;gap:6px}
+.csv-energy{margin:18px 0 22px}.csv-energy .stats-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin:14px 0}.csv-energy .filters{background:#f8fbfa}.csv-energy-charts{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;margin:16px 0}.csv-energy .card{margin-top:0}.csv-energy-asof{margin:6px 0 0;color:#647b82;font-size:12px;line-height:1.7;overflow-wrap:anywhere}.csv-energy details{padding:12px 0 0}.csv-energy details .table-wrap{margin-top:12px;max-height:420px}.csv-energy-separator{margin:26px 0 14px;font-size:15px;color:#355360}.csv-energy .stat-value{font-size:27px}.csv-energy-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:#6e818b}.csv-energy-legend span{display:inline-flex;align-items:center;gap:5px}.csv-energy-legend i{width:7px;height:7px;border-radius:50%;display:inline-block}
+@media(max-width:1000px){.csv-energy-charts{grid-template-columns:1fr}}
+@media(max-width:640px){.csv-energy .stats-grid{grid-template-columns:1fr}.csv-energy .stat-value{font-size:25px}.csv-facts{grid-template-columns:1fr}.csv-dialog{padding:18px}}
+</style>
+<style>
+.log-message{white-space:pre-wrap;overflow-wrap:anywhere;max-width:640px;line-height:1.6}
+.log-raw{margin:0;padding:18px;background:#f6f8fa;border:1px solid #e4e9ed;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.75 Consolas,"Cascadia Mono",monospace;max-height:420px;overflow:auto}
+.log-key{font:12px/1.5 Consolas,monospace;color:#52616f;overflow-wrap:anywhere}
+.log-source{font-size:12px;color:#70808c;overflow-wrap:anywhere}
+.log-problem{max-width:430px;white-space:pre-wrap;overflow-wrap:anywhere}
+.log-rule-note{display:flex;gap:12px;flex-wrap:wrap}
+.log-rule-note span{display:inline-flex;align-items:center;gap:6px}
+.log-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.log-detail-meta{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px 14px;margin:0 0 18px;font-size:13px}
+.log-detail-meta dt{color:#70808c}
+.log-detail-meta dd{margin:0;overflow-wrap:anywhere}
+.log-warning-list{margin:8px 0 0;padding-left:21px;font-size:12px;color:#7b6549;line-height:1.8}
+.log-query{min-width:210px}
+.log-row-detail{white-space:nowrap}
+@media(max-width:700px){.log-detail-meta{grid-template-columns:80px minmax(0,1fr)}.log-query{min-width:0}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">DM</span><div><strong>记录查看器</strong><div class="brand-caption">本地记录 · 离线分析</div></div></div>
+    <nav id="record-tabs" class="nav" role="tablist" aria-label="记录类型" aria-orientation="vertical">
+      <button id="tab-csv" class="nav-link is-active" type="button" role="tab" data-view="csv" aria-controls="csv-view" aria-selected="true" tabindex="0">CSV 数据趋势</button>
+      <button id="tab-logs" class="nav-link" type="button" role="tab" data-view="logs" aria-controls="logs-view" aria-selected="false" tabindex="-1">运行日志</button>
+    </nav>
+    <div id="csv-sources" class="source-panel">
+<section class="sidebar-section"><h2 class="small">已导入文件</h2><p id="file-summary" class="muted small">尚未导入 CSV</p><ul id="file-list" class="file-list"></ul></section>
+    </div>
+    <div id="logs-sources" class="source-panel" hidden>
+<section class="sidebar-section" aria-labelledby="log-files-heading">
+    <div class="card-head"><h2 id="log-files-heading" class="small">导入文件</h2><span id="log-file-count" class="badge">0</span></div>
+    <div id="log-file-list" class="file-list"><p class="muted small">尚未导入文件</p></div>
+  </section>
+    </div>
+    <p class="sidebar-note">文件只在本页内存处理，不上传或改写原件。切换保留两类记录；刷新或关闭后需重新导入。</p>
+  </aside>
+  <main id="csv-view" class="main" role="tabpanel" aria-labelledby="tab-csv" tabindex="0">
+<header class="topbar">
+    <div><div class="eyebrow">CSV / TELEMETRY</div><h1 class="page-title">电源运行回看</h1><p class="lede">查看分钟运行记录，以及按自然日／月汇总的估算用电。</p></div>
+    <div class="actions"><button id="import-button" class="button primary" type="button">导入 CSV</button><button id="clear-button" class="button quiet" type="button" disabled>清空</button></div>
+  </header>
+  <input id="file-input" class="sr-only" type="file" tabindex="-1" accept=".csv,text/csv" multiple aria-label="选择一份或多份遥测 CSV">
+  <div id="drop-zone" class="import-zone" role="button" tabindex="0" aria-label="选择或拖入 CSV 文件">
+    <strong id="import-title">拖入每日 CSV，或点击选择文件</strong>
+    <span class="muted small">可追加多个日期；按记录主键去重。单文件 32 MiB，合计 96 MiB，最多 100,000 条采样＋50,000 条电量汇总。</span>
+  </div>
+  <div id="csv-notice" class="notice info" role="status" aria-live="polite" hidden></div>
+  <details id="import-diagnostics" class="csv-import-diagnostics" hidden><summary id="diagnostics-title">导入诊断</summary><ul id="diagnostics-list"></ul></details>
+  <section class="card csv-energy" aria-labelledby="energy-heading">
+    <div class="card-head"><div><h2 id="energy-heading" class="card-title">耗电统计</h2><p class="card-subtitle">导入最新一天的新版 CSV，即可读取携带的本月逐日和历史逐月汇总。</p><p id="energy-asof" class="csv-energy-asof">尚无可用电量数据</p></div></div>
+    <div class="filters" aria-label="耗电统计筛选">
+      <label class="field field-wide">电量设备／来源<select id="energy-scope" disabled><option value="">尚无电量记录</option></select></label>
+      <label class="field">逐日统计月份<select id="energy-month" disabled><option value="">尚无月份</option></select></label>
+      <label class="field">逐月统计年份<select id="energy-year" disabled><option value="">尚无年份</option></select></label>
+      <button id="energy-export" class="button quiet" type="button" disabled>导出电量 CSV</button>
+    </div>
+    <div class="stats-grid">
+      <article class="stat-card"><div class="stat-label">统计日估算用电</div><div class="csv-stat-value-row"><strong id="energy-today" class="stat-value">—</strong><span class="stat-unit">kWh</span></div><div id="energy-today-note" class="stat-meta">以 CSV 统计日为准</div></article>
+      <article class="stat-card"><div class="stat-label">所选月估算用电</div><div class="csv-stat-value-row"><strong id="energy-month-total" class="stat-value">—</strong><span class="stat-unit">kWh</span></div><div id="energy-month-note" class="stat-meta">按本地自然月汇总</div></article>
+      <article class="stat-card"><div class="stat-label">所选年估算用电</div><div class="csv-stat-value-row"><strong id="energy-year-total" class="stat-value">—</strong><span class="stat-unit">kWh</span></div><div id="energy-year-note" class="stat-meta">按自然年各月累计</div></article>
+    </div>
+    <p id="energy-note" class="help" aria-live="polite">复用每分钟平均输入功率与有效时长估算。空白不填零，切换年月不会改变分钟趋势筛选。</p>
+    <div class="csv-energy-legend"><span><i style="background:#3f799d"></i>已结算估算</span><span><i style="background:#16756f"></i>当前期间累计</span><span><i style="background:#b47d35"></i>恢复不完整</span><span>真实 0 显示基线圆点；缺失留空</span></div>
+    <div class="csv-energy-charts">
+      <article class="card"><div class="card-head"><div><h3 class="card-title">自然月每日用电</h3><p class="card-subtitle">当前月最多 31 日；跨月后，最新文件携带上月合计。</p></div></div><div id="energy-days-chart" class="chart-host" aria-label="自然月每日估算用电柱状图"></div></article>
+      <article class="card"><div class="card-head"><div><h3 class="card-title">自然年每月用电</h3><p class="card-subtitle">按年份区分历史月份，当前月继续累计。</p></div></div><div id="energy-months-chart" class="chart-host" aria-label="自然年每月估算用电柱状图"></div></article>
+    </div>
+    <details><summary>展开日／月汇总明细</summary><div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">统计期间</th><th scope="col">估算电量 kWh</th><th scope="col">有效覆盖</th><th scope="col">状态</th><th scope="col">截至／来源</th></tr></thead><tbody id="energy-table-body"><tr><td colspan="5">导入 CSV 后查看日／月汇总</td></tr></tbody></table></div></details>
+    <p class="help">1 kWh＝1 度电。统计期间沿用 CSV 的本地日期；已结算仅表示期间结束，不表示完整监测了全天。最新电量 CSV 导出包含所选来源的完整快照与累计，不受下方分钟筛选影响。</p>
+  </section>
+  <h2 class="csv-energy-separator">分钟运行记录</h2>
+  <section class="filters" aria-label="数据筛选">
+    <label class="field field-wide">设备身份<select id="device-filter" disabled><option value="*">尚无记录</option></select></label>
+    <label class="field field-wide">运行／设备会话<select id="session-filter" disabled><option value="*">所有会话</option></select></label>
+    <label class="field">时间显示<select id="timezone-filter"><option value="local">本机时间</option><option value="utc">UTC</option></select></label>
+    <label class="field">起始分钟<input id="range-start" type="datetime-local" step="60" disabled></label>
+    <label class="field">结束分钟<input id="range-end" type="datetime-local" step="60" disabled></label>
+    <div class="csv-range-actions"><button id="apply-range" class="button" type="button" disabled>应用时间</button><button id="all-range" class="button quiet" type="button" disabled>全部时间</button><button id="export-button" class="button quiet" type="button" disabled>导出分钟筛选</button></div>
+  </section>
+  <p class="help csv-record-note">按记录区间起点筛选，包含结束分钟内的记录；统计保留完整记录，不对分钟内部插值。不同设备身份不自动合并。</p>
+  <section class="stats-grid" aria-label="功率统计">
+    <article class="stat-card"><div class="stat-label">时间加权输入功率</div><div class="csv-stat-value-row"><strong id="kpi-power" class="stat-value">—</strong><span class="stat-unit">W</span></div><div id="kpi-power-note" class="stat-meta">按有效覆盖时长加权</div></article>
+    <article class="stat-card"><div class="stat-label">观测输入功率峰值</div><div class="csv-stat-value-row"><strong id="kpi-peak" class="stat-value">—</strong><span class="stat-unit">W</span></div><div class="stat-meta">记录中已观察的最大值</div></article>
+    <article class="stat-card"><div class="stat-label">所选分钟估算电量</div><div class="csv-stat-value-row"><strong id="kpi-energy" class="stat-value">—</strong><span class="stat-unit">Wh</span></div><div id="kpi-energy-note" class="stat-meta">仅积分已覆盖数据</div></article>
+    <article class="stat-card"><div class="stat-label">有效功率记录时长</div><strong id="kpi-duration" class="stat-value">—</strong><div id="kpi-duration-note" class="stat-meta">不将缺失时段填零</div></article>
+  </section>
+  <p id="analysis-note" class="help" aria-live="polite">导入后展示统计；空值不会作为 0，风扇 0 RPM 会保留。</p>
+  <div id="quality-summary" class="csv-quality" aria-label="记录质量摘要"></div>
+  <section class="chart-grid" aria-label="遥测图表">
+    <article class="card span-2"><div class="card-head"><div><h2 class="card-title">输入功率趋势</h2><p class="card-subtitle">记录均值与观测最小／最大范围，缺口处断开。</p></div></div><div id="power-chart" class="chart-host chart-tall" aria-label="输入功率趋势图"></div></article>
+    <article class="card"><div class="card-head"><div><h2 class="card-title">三处温度</h2><p class="card-subtitle">低压侧、高压区和环境分开显示。</p></div></div><div id="temperature-chart" class="chart-host" aria-label="温度趋势图"></div></article>
+    <article class="card"><div class="card-head"><div><h2 class="card-title">风扇转速</h2><p class="card-subtitle">阶梯线表示记录均值；0 RPM 是有效读数。</p></div></div><div id="fan-chart" class="chart-host" aria-label="风扇转速阶梯图"></div></article>
+    <article class="card"><div class="card-head"><div><h2 class="card-title">四路电压</h2><p class="card-subtitle">相对标称值便于比较小幅波动，不作为合格判定。</p></div><label class="field small">显示方式<select id="rail-mode" class="csv-compact-select"><option value="percent">标称偏移 %</option><option value="volts">实测 V</option></select></label></div><div id="rails-chart" class="chart-host" aria-label="四路电压趋势图"></div></article>
+    <article class="card"><div class="card-head"><div><h2 class="card-title">输入电压与频率</h2><p class="card-subtitle">各自使用实际单位，避免双轴混淆。</p></div><label class="field small">指标<select id="mains-mode" class="csv-compact-select"><option value="voltage">输入电压 V</option><option value="frequency">输入频率 Hz</option></select></label></div><div id="mains-chart" class="chart-host" aria-label="输入电气参数趋势图"></div></article>
+    <article class="card"><div class="card-head"><div><h2 class="card-title">负载分布</h2><p class="card-subtitle">按记录均值分箱，以有效覆盖分钟数加权。</p></div></div><div id="distribution-chart" class="chart-host" aria-label="功率分布柱状图"></div></article>
+    <article class="card"><div class="card-head"><div><h2 class="card-title">记录状态摘要</h2><p class="card-subtitle">来自区间摘要字段，不代表精确在线时间；空档为未记录。</p></div></div><div id="state-chart" class="chart-host" aria-label="记录状态摘要时间带"></div></article>
+  </section>
+  <section class="card" aria-labelledby="records-heading">
+    <div class="card-head"><div><h2 id="records-heading" class="card-title">记录明细</h2><p id="table-summary" class="card-subtitle">尚无记录</p></div><div class="actions"><label class="field small">明细标记<select id="quality-filter"><option value="all">全部记录</option><option value="issue">非连接／缺失／故障</option><option value="partial">部分区间</option><option value="fault">观察到非零故障码</option></select></label><label class="field small">搜索<input id="record-search" type="search" placeholder="设备、会话、来源或原因" maxlength="200"></label></div></div>
+    <p class="help">明细标记与搜索只影响本表；图表和统计仍使用上方筛选。点击“详情”查看全部指标及来源。</p>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">区间起点</th><th scope="col">输入功率 W</th><th scope="col">风扇 RPM</th><th scope="col">低压 ℃</th><th scope="col">输入 V</th><th scope="col">功率有效秒</th><th scope="col">状态／标记</th><th scope="col">来源</th><th scope="col">操作</th></tr></thead><tbody id="records-body"><tr><td class="csv-empty-cell" colspan="9">导入 CSV 后查看记录</td></tr></tbody></table></div>
+    <div class="pagination"><button id="previous-page" class="button quiet" type="button" disabled>上一页</button><span id="page-label" class="small muted">第 0 / 0 页</span><button id="next-page" class="button quiet" type="button" disabled>下一页</button><label class="field small">每页<select id="page-size"><option value="25">25 条</option><option value="50" selected>50 条</option><option value="100">100 条</option></select></label></div>
+  </section>
+  <p class="footer-note">曲线是记录均值的可视化，并非原始瞬时采样。部分区间、重启和时间缺口会保留；源文件不会被改写。</p>
+  </main>
+  <main id="logs-view" class="main" role="tabpanel" aria-labelledby="tab-logs" tabindex="0" hidden>
+<header class="topbar">
+    <div><p class="eyebrow">DM AGENT / LOCAL RECORDS</p><h1 class="page-title">运行日志</h1><p class="lede">按时间回看连接变化、记录异常与操作事件。</p></div>
+    <div class="actions"><button type="button" id="log-import" class="button primary">导入日志</button><button type="button" id="log-clear" class="button quiet" disabled>清空</button></div>
+  </header>
+  <input id="log-file-input" class="sr-only" tabindex="-1" type="file" accept=".log,.txt,text/plain" multiple aria-label="选择日志文件">
+  <div id="log-notice" class="notice" role="status" aria-live="polite" hidden></div>
+  <section id="log-drop" class="import-zone" role="button" tabindex="0" aria-label="点击或拖入日志文件">
+    <strong id="log-drop-title">将运行日志拖到这里，或点击选择文件</strong>
+    <p id="log-drop-subtitle">支持多个 .log / .txt 文件。每个文件最多 32 MiB，总计最多 64 MiB、10 万条事件。</p>
+  </section>
+  <section class="filters" aria-label="日志筛选">
+    <label class="field"><span>开始时间（含）</span><input id="log-start" type="datetime-local" step="60"></label>
+    <label class="field"><span>结束时间（不含）</span><input id="log-end" type="datetime-local" step="60"></label>
+    <label class="field"><span>时间显示</span><select id="log-zone"><option value="local">本机时间</option><option value="utc">UTC</option></select></label>
+    <label class="field"><span>来源文件</span><select id="log-source"><option value="">全部文件</option></select></label>
+    <label class="field"><span>事件类型</span><select id="log-key"><option value="">全部类型</option></select></label>
+    <label class="field"><span>推断等级</span><select id="log-level"><option value="">全部等级</option><option value="error">错误（规则）</option><option value="warn">警告（规则）</option><option value="info">信息（规则）</option><option value="unknown">未归类</option></select></label>
+    <label class="field field-wide log-query"><span>关键字</span><input id="log-query" type="search" placeholder="搜索内容、事件或文件名"></label>
+    <button id="log-reset" type="button" class="button quiet">重置筛选</button>
+  </section>
+  <div class="actions small">
+    <label class="check"><input id="log-dedupe" type="checkbox" checked> 合并跨文件相同条目，保留同一文件内的重复</label>
+    <label class="check"><input id="log-unknown" type="checkbox" checked> 保留无时间条目</label>
+    <span id="log-filter-summary" class="muted">等级由事件名和关键字归类，原日志不含正式等级。</span>
+  </div>
+  <div class="stats-grid">
+    <section class="stat-card"><p class="stat-label">筛选条目</p><div id="log-stat-total" class="stat-value">—</div><p id="log-stat-total-note" class="stat-meta">导入后统计</p></section>
+    <section class="stat-card"><p class="stat-label">错误 / 警告 · 规则归类</p><div id="log-stat-issues" class="stat-value">—</div><p class="stat-meta">按原有条目计数，不代表设备故障次数</p></section>
+    <section class="stat-card"><p class="stat-label">连接类事件</p><div id="log-stat-connection" class="stat-value">—</div><p class="stat-meta">来自 connection 事件</p></section>
+    <section class="stat-card"><p class="stat-label">另报告合并次数</p><div id="log-stat-suppressed" class="stat-value">—</div><p class="stat-meta">属该 key 此前抑制消息，具体时间未知</p></section>
+  </div>
+  <div class="chart-grid">
+    <section class="card span-2">
+      <div class="card-head"><div><h2 class="card-title">事件时间分布</h2><p class="card-subtitle" id="log-activity-note">每个可识别时间条目记一次，续行及合并次数不加权。</p></div></div>
+      <div class="log-rule-note small"><span><i class="log-dot" style="background:#16756f"></i>信息</span><span><i class="log-dot" style="background:#b47d35"></i>警告</span><span><i class="log-dot" style="background:#b5524f"></i>错误</span></div>
+      <div id="log-activity-chart" class="chart-host chart-tall" aria-label="事件时间分布柱状图"></div>
+    </section>
+    <section class="card">
+      <div class="card-head"><div><h2 class="card-title">事件类别</h2><p class="card-subtitle">当前筛选下的条目数量，最多展示前 10 类。</p></div></div>
+      <div id="log-category-chart" class="chart-host" aria-label="事件类别条形图"></div>
+    </section>
+    <section class="card">
+      <div class="card-head"><div><h2 class="card-title">连接状态记录</h2><p class="card-subtitle">仅受时间与来源筛选影响；按事件延续的摘要，不能当作实测在线率。</p></div></div>
+      <div id="log-state-chart" class="chart-host" aria-label="连接状态摘要时间带"></div>
+      <p class="help">首条状态事件前及无法解释的连接事件标为未知；缺失日志不能自动识别，末次日志后不外推。跨文件按日志时间排序，独立运行日志建议按来源筛选，时钟回拨可能改变事件先后。</p>
+    </section>
+    <section class="card span-2">
+      <div class="card-head"><div><h2 class="card-title">重复问题与关注事件</h2><p class="card-subtitle">按 key 与当前消息文本归组；仅统计错误 / 警告条目，不把“合并重复”附给当前消息。</p></div></div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>事件</th><th>内容</th><th>条目数</th><th>首次 / 末次</th></tr></thead><tbody id="log-problem-body"></tbody></table></div>
+    </section>
+  </div>
+  <section class="card">
+    <div class="card-head"><div><h2 class="card-title">日志明细</h2><p class="card-subtitle" id="log-table-note">导入日志后显示；未知条目保留原文。</p></div><button id="log-export" type="button" class="button quiet" disabled>导出筛选事件</button></div>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>时间</th><th>推断等级</th><th>事件 / 来源</th><th>内容</th><th>原文</th></tr></thead><tbody id="log-table-body"></tbody></table></div>
+    <div class="pagination"><div class="actions"><label class="field"><span class="sr-only">每页条数</span><select id="log-page-size"><option value="50">每页 50 条</option><option value="100">每页 100 条</option></select></label><span id="log-page-info" class="muted">0 条</span></div><div class="actions"><button id="log-prev" type="button" class="button quiet" disabled>上一页</button><button id="log-next" type="button" class="button quiet" disabled>下一页</button></div></div>
+  </section>
+  <section id="log-detail" class="card" hidden aria-labelledby="log-detail-title">
+    <div class="card-head"><h2 id="log-detail-title" class="card-title">原始事件</h2><button id="log-detail-close" type="button" class="button quiet">收起</button></div>
+    <dl id="log-detail-meta" class="log-detail-meta"></dl>
+    <pre id="log-detail-raw" class="log-raw"></pre>
+  </section>
+  <details class="card small" id="log-import-info"><summary>导入规则与文件说明</summary><p class="help">每次导入都读取实际内容，不以同名或修改时间判断重复；来源编号区分同名文件。跨文件去重按相同原文及该条原文在文件内的出现次序匹配，可取消勾选恢复全部条目。无时间条目不受时间筛选限制，单独保留；前导空白续行附在上一条完整事件后。日志中的“合并重复 N 次”只作独立报告，不推断其对应消息或发生时间。rx_rejected 条目数不是坏帧数量，原始故障码也不解码。</p><ul id="log-import-warnings" class="log-warning-list"><li>尚未导入文件。</li></ul></details>
+  <p class="footer-note">纯离线读取 · 不上传文件 · 不连接 DM Agent 或设备 · 清空或关闭页面后重新导入</p>
+  </main>
+</div>
+<dialog id="record-dialog" class="csv-dialog">
+  <div class="csv-dialog-head"><div><div class="eyebrow">RECORD DETAIL</div><h2>区间记录详情</h2></div><button id="close-dialog" class="button quiet" type="button" aria-label="关闭记录详情">关闭</button></div>
+  <dl id="record-facts" class="csv-facts"></dl>
+  <div class="table-wrap"><table class="data-table metric-table"><thead><tr><th scope="col">指标</th><th scope="col">均值</th><th scope="col">最小</th><th scope="col">最大</th><th scope="col">末值</th><th scope="col">有效秒</th></tr></thead><tbody id="metric-details"></tbody></table></div>
+  <p class="help">有效时长为区间内累计值，缺失的具体位置未知。原始 CSV 中的空值显示为 —，不会补 0。</p>
+  <details><summary class="small">原始字段</summary><div class="table-wrap"><table class="data-table"><tbody id="raw-details"></tbody></table></div></details>
+</dialog>
+
+<script>
+(function () {
+'use strict';
+const palette=['#16756f','#3f799d','#b47d35','#758499','#8b718f','#a56464'];
+const el=id=>typeof id==='string'?document.getElementById(id):id;
+const text=(target,value)=>{const node=el(target);if(node)node.textContent=value==null?'':String(value);return node;};
+const numberPattern=/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i;
+function num(value){if(value==null || typeof value==='boolean')return null;const s=String(value).trim();if(!s || !numberPattern.test(s))return null;const n=Number(s);return Number.isFinite(n)?n:null;}
+const formats=new Map();
+function fmt(value,places=2){const n=num(value);if(n==null)return '—';const p=Math.max(0,Math.min(8,places|0)),magnitude=Math.abs(n);if(magnitude>=1e12||(magnitude>0&&magnitude<1e-6))return n.toExponential(Math.max(1,Math.min(4,p)));if(!formats.has(p))formats.set(p,new Intl.NumberFormat('zh-CN',{maximumFractionDigits:p}));return formats.get(p).format(n);}
+function duration(ms){const n=num(ms);if(n==null || n<0)return '—';if(n<1000)return fmt(n,0)+' 毫秒';let s=Math.round(n/1000);const d=Math.floor(s/86400);s%=86400;const h=Math.floor(s/3600);s%=3600;const m=Math.floor(s/60);s%=60;return (d?d+' 天 ':'')+(h?h+' 小时 ':'')+(m?m+' 分 ':'')+(!d && !h && s?s+' 秒':'') || '0 秒';}
+function bytes(n){if(!Number.isFinite(n))return '—';return n<1024?n+' B':n<1048576?fmt(n/1024,1)+' KiB':fmt(n/1048576,1)+' MiB';}
+const pad=n=>String(n).padStart(2,'0');
+function dateParts(ms,utc){const d=new Date(ms);if(!Number.isFinite(d.getTime()))return null;const get=name=>d[(utc?'getUTC':'get')+name]();return [get('FullYear'),pad(get('Month')+1),pad(get('Date')),pad(get('Hours')),pad(get('Minutes')),pad(get('Seconds'))];}
+function time(ms,utc=false,seconds=true){if(ms==null)return '—';const p=dateParts(ms,utc);return p?p[0]+'-'+p[1]+'-'+p[2]+' '+p[3]+':'+p[4]+(seconds?':'+p[5]:''):'—';}
+function tickTime(ms,utc=false,withDate=false){const p=dateParts(ms,utc);return p?(withDate?p[1]+'-'+p[2]+' ':'')+p[3]+':'+p[4]:'—';}
+function inputTime(ms,utc=false){const p=dateParts(ms,utc);return p?p[0]+'-'+p[1]+'-'+p[2]+'T'+p[3]+':'+p[4]:'';}
+function parseInput(value,utc=false){if(!value)return null;const m=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(value);if(!m)return null;const a=m.slice(1).map(v=>Number(v||0));const d=utc?new Date(Date.UTC(a[0],a[1]-1,a[2],a[3],a[4],a[5])):new Date(a[0],a[1]-1,a[2],a[3],a[4],a[5]);const p=dateParts(d.getTime(),utc);if(!p || p[0]!==a[0] || Number(p[1])!==a[1] || Number(p[2])!==a[2] || Number(p[3])!==a[3] || Number(p[4])!==a[4])return null;return d.getTime();}
+const nextFrame=()=>new Promise(resolve=>setTimeout(resolve,0));
+function debounce(fn,ms=180){let timer;return function(){const args=arguments;clearTimeout(timer);timer=setTimeout(()=>fn.apply(this,args),ms);};}
+async function readText(file){
+ const buffer=await file.arrayBuffer();const b=new Uint8Array(buffer);let encoding='UTF-8',content;
+ if(b[0]===0xff && b[1]===0xfe){encoding='UTF-16LE';content=new TextDecoder('utf-16le',{fatal:true}).decode(buffer);}
+ else if(b[0]===0xfe && b[1]===0xff){encoding='UTF-16BE';content=new TextDecoder('utf-16be',{fatal:true}).decode(buffer);}
+ else {try{content=new TextDecoder('utf-8',{fatal:true}).decode(buffer);}catch(error){encoding='GB18030（兼容读取）';content=new TextDecoder('gb18030',{fatal:true}).decode(buffer);}}
+ content=content.replace(/^\uFEFF/,'');return {text:content,encoding,unterminated:content.length>0&&!/[\r\n]$/.test(content)};
+}
+async function parseCSV(content,options={}){
+ const maxRows=options.maxRows==null?100000:options.maxRows;
+ const maxColumns=options.maxColumns==null?256:options.maxColumns;
+ const source=String(content).replace(/^\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+ const rows=[],issues=[];let headers=null,row=[],field='',quoted=false,after=false,started=false,bad='',line=1,rowLine=1,blankRows=0,issueCount=0;
+ const issue=message=>{issueCount++;if(issues.length<24)issues.push(message);};
+ const endField=()=>{row.push(field);field='';after=false;started=false;if(row.length>maxColumns)throw new Error('列数超过 '+maxColumns+'，请确认文件格式');};
+ function endRow(){
+  if(row.length===1 && row[0].trim()==='' && !bad)blankRows++;
+  else if(!headers){
+   if(bad)throw new Error('CSV 表头无效：'+bad);
+   headers=row.map(v=>v.trim());
+   if(headers.length<2 || headers.some(h=>!h))throw new Error('CSV 表头缺失或包含空列名');
+   if(new Set(headers).size!==headers.length)throw new Error('CSV 表头包含重复列名');
+   if(headers.some(h=>['__proto__','constructor','prototype'].includes(h)))throw new Error('CSV 包含不支持的保留列名');
+  }else if(bad)issue('第 '+rowLine+' 行：'+bad+'，已跳过');
+  else if(row.length!==headers.length)issue('第 '+rowLine+' 行有 '+row.length+' 列，预期 '+headers.length+' 列，已跳过');
+  else{if(rows.length>=maxRows)throw new Error('记录数超过 '+fmt(maxRows,0)+'，请按日期分批导入');rows.push({values:row,line:rowLine});}
+  row=[];field='';after=false;started=false;bad='';rowLine=line+1;
+ }
+ for(let i=0;i<source.length;i++){
+  const ch=source[i];
+  if(quoted){
+   if(ch==='"'){if(source[i+1]==='"'){field+='"';i++;}else{quoted=false;after=true;}}
+   else{field+=ch;if(ch==='\n')line++;}
+  }else if(ch===','){endField();}
+  else if(ch==='\n'){endField();endRow();line++;}
+  else if(after){if(ch!==' '&&ch!=='\t'){bad='引号结束后存在非分隔字符';field+=ch;after=false;}}
+  else if(ch==='"'){if(!started && field===''){quoted=true;started=true;}else{bad='未转义的引号';field+=ch;}}
+  else{field+=ch;started=true;}
+  if((i&262143)===262143){if(options.onProgress)options.onProgress(i/source.length);await nextFrame();}
+ }
+ if(quoted)issue('第 '+rowLine+' 行的引号未结束，末条记录未导入');
+ else if(row.length || field!=='' || started || after){endField();endRow();}
+ if(!headers)throw new Error('文件为空，未找到 CSV 表头');
+ if(issueCount>issues.length)issues.push('另有 '+(issueCount-issues.length)+' 条格式问题未逐项列出');
+ return {headers,rows,issues,issueCount,blankRows,unterminated:source.length>0&&!source.endsWith('\n')};
+}
+function fillSelect(target,items,selected){const node=el(target);if(!node)return;const previous=selected==null?node.value:String(selected);const fragment=document.createDocumentFragment();for(const item of items){const option=document.createElement('option');option.value=String(item.value);option.textContent=item.label;fragment.append(option);}node.replaceChildren(fragment);if(items.some(item=>String(item.value)===previous))node.value=previous;}
+function notice(message,tone='info',target='notice'){const node=el(target);if(!node)return;node.className='notice '+(tone==='warn'||tone==='error'?tone:'info');node.textContent=message||'';node.hidden=!message;}
+function download(content,filename,mime='text/plain;charset=utf-8'){const blob=content instanceof Blob?content:new Blob([content],{type:mime});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=String(filename||'records.txt').replace(/[\\/:*?"<>|]/g,'_');link.hidden=true;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
+function csvCell(value){let s=value==null?'':String(value);if(!numberPattern.test(s.trim()) && (/^[\s\u0000-\u001f]*[=+\-@]/.test(s)||/^[\t\r\n]/.test(s)))s="'"+s;return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function exportCSV(headers,records,filename){const lines=[headers.map(csvCell).join(',')];for(const record of records)lines.push(headers.map(h=>csvCell(record[h])).join(','));download('\uFEFF'+lines.join('\r\n')+'\r\n',filename,'text/csv;charset=utf-8');}
+function finite(v){return typeof v==='number'&&Number.isFinite(v);}
+function segments(points){
+ const result=[];let part=[];
+ for(const p of points||[]){if(!finite(p.x)||!finite(p.y)){if(part.length)result.push(part);part=[];continue;}if(p.breakBefore&&part.length){result.push(part);part=[];}part.push(p);}
+ if(part.length)result.push(part);return result;
+}
+function reduceSegment(points,limit){
+ if(points.length<=limit)return points;
+ if(limit<2)return [points[0]];
+ const output=[points[0]],count=Math.max(0,Math.floor((limit-2)/4)),span=count?(points.length-2)/count:0;
+ for(let i=0;i<count;i++){
+  const start=1+Math.floor(i*span),end=Math.min(points.length-1,1+Math.floor((i+1)*span));
+  let lowY=null,highY=null,lowBand=null,highBand=null;
+  for(let j=start;j<end;j++){
+   const p=points[j];
+   if(!lowY||p.y<lowY.y)lowY=p;if(!highY||p.y>highY.y)highY=p;
+   if(!lowBand||(finite(p.low)?p.low:p.y)<(finite(lowBand.low)?lowBand.low:lowBand.y))lowBand=p;
+   if(!highBand||(finite(p.high)?p.high:p.y)>(finite(highBand.high)?highBand.high:highBand.y))highBand=p;
+  }
+  const chosen=Array.from(new Set([lowY,highY,lowBand,highBand].filter(Boolean))).sort((a,b)=>a.x-b.x);
+  output.push(...chosen);
+ }
+ output.push(points[points.length-1]);return output;
+}
+function preparedSeries(series,budget){
+ const output=[];
+ for(let i=0;i<series.length;i++){
+  const item=series[i],allParts=segments(item.points);
+  let parts=allParts;
+  const maxParts=Math.max(1,Math.floor(budget/3));
+  if(parts.length>maxParts)parts=Array.from({length:maxParts},(_,index)=>allParts[Math.floor(index*(allParts.length-1)/(maxParts-1))]);
+  const total=parts.reduce((n,p)=>n+p.length,0);let remaining=budget;
+  const sampled=[];
+  for(let index=0;index<parts.length;index++){
+   const part=parts[index],reserved=2*(parts.length-index-1);
+   const allowance=Math.max(2,Math.min(remaining-reserved,Math.round(budget*part.length/Math.max(1,total))));
+   const selected=reduceSegment(part,allowance);sampled.push(selected);remaining-=selected.length;
+  }
+  output.push(Object.assign({},item,{color:item.color||palette[i%palette.length],parts:sampled,valid:(item.points||[]).filter(p=>finite(p.x)&&finite(p.y)),sampled:allParts.length!==parts.length||total>budget}));
+ }
+ return output;
+}
+function label(ctx,value,x,y,align='left',color='#71808b'){ctx.fillStyle=color;ctx.textAlign=align;ctx.fillText(value,x,y);}
+function shortLabel(ctx,value,width){const s=String(value);if(ctx.measureText(s).width<=width)return s;let lo=0,hi=Math.min(s.length,256);while(lo<hi){const mid=Math.ceil((lo+hi)/2);if(ctx.measureText(s.slice(0,mid)+'…').width<=width)lo=mid;else hi=mid-1;}return s.slice(0,lo)+'…';}
+class Chart {
+ constructor(target){
+  this.host=el(target);if(!this.host)throw new Error('未找到图表容器 '+target);
+  this.legend=document.createElement('div');this.legend.className='chart-legend';
+  this.wrap=document.createElement('div');this.wrap.className='plot-wrap';
+  this.canvas=document.createElement('canvas');this.canvas.setAttribute('role','img');this.canvas.tabIndex=0;
+  this.tooltip=document.createElement('div');this.tooltip.className='plot-tooltip';this.tooltip.hidden=true;this.tooltip.setAttribute('role','tooltip');
+  this.wrap.append(this.canvas,this.tooltip);this.host.replaceChildren(this.legend,this.wrap);
+  this.base=document.createElement('canvas');this.spec={type:'line',series:[]};this.series=[];this.frame=0;this.hits=[];
+  this.onMove=event=>this.hover(event);this.onLeave=()=>{this.tooltip.hidden=true;this.restore();};
+  this.canvas.addEventListener('pointermove',this.onMove);this.canvas.addEventListener('pointerleave',this.onLeave);this.canvas.addEventListener('blur',this.onLeave);
+  this.onResize=()=>{cancelAnimationFrame(this.frame);this.frame=requestAnimationFrame(()=>this.render());};
+  if(typeof ResizeObserver!=='undefined'){this.observer=new ResizeObserver(this.onResize);this.observer.observe(this.wrap);}else window.addEventListener('resize',this.onResize);
+ }
+ set(spec){
+  this.spec=Object.assign({type:'line',series:[],bars:[],intervals:[],utc:false,emptyText:'导入文件后显示图表'},spec);
+  this.host.classList.toggle('is-timeline',this.spec.type==='timeline');
+  this.series=preparedSeries(this.spec.series||[],2600);this.hits=[];
+  this.canvas.setAttribute('aria-label',(this.spec.title||'数据图表')+'；精确数据可在记录明细查看');
+  this.legend.replaceChildren();
+  let items=this.spec.type==='line'?this.series.map(v=>({name:v.name,color:v.color})):this.spec.type==='timeline'?Array.from(new Map((this.spec.intervals||[]).map(v=>[v.label,{name:v.label,color:v.color||'#aab6bf'}])).values()):[];
+  for(const item of items.slice(0,12)){const badge=document.createElement('span');const dot=document.createElement('i');dot.style.backgroundColor=item.color;badge.append(dot,document.createTextNode(item.name));this.legend.append(badge);}
+  if(this.series.some(v=>v.sampled)){const note=document.createElement('span');note.className='muted';note.textContent='绘图已抽稀，统计保留全部记录';this.legend.append(note);}
+  this.tooltip.hidden=true;this.onResize();
+ }
+ restore(){const ctx=this.canvas.getContext('2d');if(ctx&&this.base.width) {ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,this.canvas.width,this.canvas.height);ctx.drawImage(this.base,0,0);}}
+ render(){
+  const w=Math.max(260,Math.floor(this.wrap.clientWidth||600)),h=Math.max(90,Math.floor(this.wrap.clientHeight||230)),dpr=Math.min(window.devicePixelRatio||1,2);
+  this.width=w;this.height=h;this.dpr=dpr;
+  this.canvas.width=this.base.width=Math.round(w*dpr);this.canvas.height=this.base.height=Math.round(h*dpr);
+  this.canvas.style.width=w+'px';this.canvas.style.height=h+'px';
+  const ctx=this.base.getContext('2d');if(!ctx)return;
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h);ctx.font='11px "Segoe UI","Microsoft YaHei",sans-serif';
+  this.hits=[];
+  const spec=this.spec,kind=spec.type;
+  const has=kind==='line'?this.series.some(s=>s.valid.length):kind==='timeline'?(spec.intervals||[]).some(s=>finite(s.start)&&finite(s.end)&&s.end>s.start):(spec.bars||[]).some(s=>!s.missing&&(finite(s.value)||(s.parts||[]).some(p=>finite(p.value))));
+  if(!has){label(ctx,spec.emptyText||'没有可显示的数据',w/2,h/2,'center','#94a0aa');this.plot=null;this.restore();return;}
+  if(kind==='bars')this.drawBars(ctx,w,h);
+  else if(kind==='histogram')this.drawHistogram(ctx,w,h);
+  else if(kind==='timeline')this.drawTimeline(ctx,w,h);
+  else this.drawLine(ctx,w,h);
+  this.restore();
+ }
+ domain(){
+  const spec=this.spec;let min=Infinity,max=-Infinity;
+  if(spec.type==='timeline')for(const s of spec.intervals||[]){if(finite(s.start))min=Math.min(min,s.start);if(finite(s.end))max=Math.max(max,s.end);}
+  else for(const s of this.series)for(const p of s.valid){min=Math.min(min,p.x);max=Math.max(max,p.x);}
+  if(finite(spec.xmin))min=spec.xmin;if(finite(spec.xmax))max=spec.xmax;
+  if(!finite(min)||!finite(max))return [0,1];if(max<=min)max=min+60000;return [min,max];
+ }
+ axis(ctx,plot,ymin,ymax,unit){
+  const {x,y,w,h}=plot;ctx.strokeStyle='#e9eef1';ctx.lineWidth=1;
+  const step=Math.abs(ymax-ymin)/4,places=step>0&&step<1?Math.max(2,Math.min(8,Math.ceil(-Math.log10(step))+1)):2;
+  for(let i=0;i<=4;i++){
+   const py=y+h-h*i/4,value=ymin+(ymax-ymin)*(i/4);
+   ctx.beginPath();ctx.moveTo(x,py+.5);ctx.lineTo(x+w,py+.5);ctx.stroke();
+   let caption=fmt(value,places);if(value!==0&&ctx.measureText(caption).width>x-14)caption=value.toExponential(1);
+   label(ctx,caption,x-9,py+4,'right');
+  }
+  if(unit)label(ctx,unit,x,y-10,'left','#70808a');
+ }
+ timeAxis(ctx,plot,min,max){
+  const ticks=this.width<480?3:5,span=max-min;
+  for(let i=0;i<ticks;i++){const v=min+span*(i/(ticks-1));label(ctx,tickTime(v,this.spec.utc,span>=86400000),plot.x+plot.w*i/(ticks-1),plot.y+plot.h+23,i===0?'left':i===ticks-1?'right':'center');}
+ }
+ rangeError(ctx,w,h){this.plot=null;this.hits=[];label(ctx,'数值范围超出绘图能力，请查看记录明细',w/2,h/2,'center','#94a0aa');}
+ drawLine(ctx,w,h){
+  const [min,max]=this.domain();let ymin=Infinity,ymax=-Infinity;
+  for(const s of this.series)for(const p of s.valid){ymin=Math.min(ymin,p.y);ymax=Math.max(ymax,p.y);if(s.band){if(finite(p.low))ymin=Math.min(ymin,p.low);if(finite(p.high))ymax=Math.max(ymax,p.high);}}
+  if(this.spec.zero){ymin=Math.min(0,ymin);ymax=Math.max(0,ymax);}
+  if(ymax===ymin){const pad=Math.max(1,Math.abs(ymin)*.03);ymin-=pad;ymax+=pad;}
+  else{const pad=(ymax-ymin)*.09;ymin-=pad;ymax+=pad;}
+  if(finite(this.spec.ymin))ymin=this.spec.ymin;if(finite(this.spec.ymax))ymax=this.spec.ymax;
+  if(ymax<=ymin)ymax=ymin+1;
+  if(![min,max,ymin,ymax,max-min,ymax-ymin].every(finite)||max<=min||ymax<=ymin){this.rangeError(ctx,w,h);return;}
+  const plot={x:62,y:24,w:Math.max(80,w-78),h:Math.max(30,h-58),min,max,ymin,ymax};this.plot=plot;
+  const X=v=>plot.x+(v-min)/(max-min)*plot.w,Y=v=>plot.y+plot.h-(v-ymin)/(ymax-ymin)*plot.h;
+  this.axis(ctx,plot,ymin,ymax,this.spec.unit||'');this.timeAxis(ctx,plot,min,max);
+  ctx.save();ctx.beginPath();ctx.rect(plot.x,plot.y,plot.w,plot.h);ctx.clip();
+  for(const s of this.series){
+   if(s.band)for(const part of s.parts){let run=[];const draw=()=>{if(!run.length)return;ctx.beginPath();run.forEach((p,i)=>i?ctx.lineTo(X(p.x),Y(p.high)):ctx.moveTo(X(p.x),Y(p.high)));for(let i=run.length-1;i>=0;i--)ctx.lineTo(X(run[i].x),Y(run[i].low));ctx.closePath();ctx.globalAlpha=.12;ctx.fillStyle=s.color;ctx.fill();ctx.globalAlpha=1;run=[];};for(const p of part){if(finite(p.low)&&finite(p.high))run.push(p);else draw();}draw();}
+   ctx.strokeStyle=s.color;ctx.lineWidth=1.8;ctx.lineJoin='round';
+   for(const part of s.parts){if(!part.length)continue;ctx.beginPath();for(let i=0;i<part.length;i++){const p=part[i];if(!i)ctx.moveTo(X(p.x),Y(p.y));else{if(s.step)ctx.lineTo(X(p.x),Y(part[i-1].y));ctx.lineTo(X(p.x),Y(p.y));}}ctx.stroke();if(part.length===1){ctx.fillStyle=s.color;ctx.beginPath();ctx.arc(X(part[0].x),Y(part[0].y),2.3,0,Math.PI*2);ctx.fill();}}
+  }
+  ctx.restore();
+ }
+ barTotal(bar){if(bar.missing)return 0;return Array.isArray(bar.parts)&&bar.parts.length?bar.parts.reduce((sum,p)=>sum+(finite(p.value)?Math.max(0,p.value):0),0):finite(bar.value)?Math.max(0,bar.value):0;}
+ drawHistogram(ctx,w,h){
+  const bars=(this.spec.bars||[]).slice(0,200),largest=Math.max(0,...bars.map(b=>this.barTotal(b))),max=(largest>0?largest:1)*1.12;
+  if(!finite(max)){this.rangeError(ctx,w,h);return;}
+  const plot={x:56,y:24,w:w-72,h:h-64};this.plot=plot;this.axis(ctx,plot,0,max,this.spec.unit||'');
+  const step=plot.w/Math.max(1,bars.length),bw=Math.max(1,step-5),every=Math.max(1,Math.ceil(bars.length/7));
+  bars.forEach((bar,i)=>{
+   const x=plot.x+i*step+2;
+   if(i%every===0||i===bars.length-1)label(ctx,shortLabel(ctx,bar.label,Math.max(44,step*every-8)),x+bw/2,plot.y+plot.h+22,'center');
+   if(bar.missing||!(finite(bar.value)||(bar.parts||[]).some(part=>finite(part.value))))return;
+   let total=0;
+   const parts=bar.parts&&bar.parts.length?bar.parts:[{value:this.barTotal(bar),color:bar.color||palette[0]}];
+   for(const part of parts){const value=finite(part.value)?Math.max(0,part.value):0;const bh=value/max*plot.h;ctx.fillStyle=part.color||palette[0];ctx.fillRect(x,plot.y+plot.h-(total+value)/max*plot.h,bw,bh);total+=value;}
+   if(total===0){ctx.fillStyle=bar.color||(parts[0]&&parts[0].color)||palette[0];ctx.beginPath();ctx.arc(x+bw/2,plot.y+plot.h-2,2,0,Math.PI*2);ctx.fill();}
+   this.hits.push({x,y:plot.y,w:bw,h:plot.h,bar});
+  });
+ }
+ drawBars(ctx,w,h){
+  const bars=(this.spec.bars||[]).slice(0,14),max=Math.max(1,...bars.map(b=>this.barTotal(b)))*1.15;
+  if(!finite(max)){this.rangeError(ctx,w,h);return;}
+  const left=Math.min(155,Math.max(90,w*.30)),plot={x:left,y:12,w:Math.max(60,w-left-36),h:h-28};this.plot=plot;
+  const step=plot.h/Math.max(1,bars.length),bh=Math.min(21,step*.65);
+  bars.forEach((bar,i)=>{const cy=plot.y+(i+.5)*step;label(ctx,shortLabel(ctx,bar.label,left-18),left-12,cy+4,'right','#4f616d');const parts=bar.parts&&bar.parts.length?bar.parts:[{value:this.barTotal(bar),color:bar.color||palette[i%palette.length]}];let total=0;for(const part of parts){const value=finite(part.value)?Math.max(0,part.value):0;ctx.fillStyle=part.color||palette[0];ctx.fillRect(plot.x+total/max*plot.w,cy-bh/2,value/max*plot.w,bh);total+=value;}label(ctx,fmt(total,2),plot.x+total/max*plot.w+7,cy+4,'left','#425660');this.hits.push({x:0,y:cy-step/2,w,h:step,bar});});
+ }
+ drawTimeline(ctx,w,h){
+  const [min,max]=this.domain();if(!finite(max-min)||max<=min){this.rangeError(ctx,w,h);return;}const plot={x:12,y:16,w:w-24,h:28,min,max};this.plot=plot;
+  ctx.fillStyle='#eef1f4';ctx.fillRect(plot.x,plot.y,plot.w,plot.h);
+  const intervals=(this.spec.intervals||[]).filter(s=>finite(s.start)&&finite(s.end)&&s.end>s.start);
+  for(const item of intervals){const x=plot.x+(Math.max(min,item.start)-min)/(max-min)*plot.w,xe=plot.x+(Math.min(max,item.end)-min)/(max-min)*plot.w;if(xe<x||xe<plot.x||x>plot.x+plot.w)continue;const width=Math.max(.8,xe-x);ctx.fillStyle=item.color||'#aab6bf';ctx.fillRect(x,plot.y,width,plot.h);if(width>100)label(ctx,shortLabel(ctx,item.label,width-12),x+width/2,plot.y+18,'center','#ffffff');this.hits.push({x,y:plot.y,w:width,h:plot.h,item});}
+  this.timeAxis(ctx,plot,min,max);
+ }
+ tooltipLines(lines,event){
+  this.tooltip.replaceChildren();
+  for(let i=0;i<lines.length;i++){const node=document.createElement(i?'div':'strong');node.textContent=lines[i];this.tooltip.append(node);}
+  this.tooltip.hidden=false;const rect=this.wrap.getBoundingClientRect(),x=event.clientX-rect.left,y=event.clientY-rect.top;
+  const tw=this.tooltip.offsetWidth,th=this.tooltip.offsetHeight;
+  this.tooltip.style.left=Math.max(4,Math.min(this.width-tw-4,x+14))+'px';this.tooltip.style.top=Math.max(4,Math.min(this.height-th-4,y+14))+'px';
+ }
+ hover(event){
+  if(!this.plot)return;
+  const rect=this.canvas.getBoundingClientRect(),x=(event.clientX-rect.left)*this.width/rect.width,y=(event.clientY-rect.top)*this.height/rect.height;
+  this.restore();const spec=this.spec;
+  if(spec.type==='line'){
+   const plot=this.plot;if(x<plot.x||x>plot.x+plot.w||y<plot.y||y>plot.y+plot.h){this.tooltip.hidden=true;return;}
+   const target=plot.min+(x-plot.x)/plot.w*(plot.max-plot.min);let nearest=null,chosen=[];
+   for(const series of this.series){const a=series.valid;if(!a.length)continue;let lo=0,hi=a.length;while(lo<hi){const mid=(lo+hi)>>1;if(a[mid].x<target)lo=mid+1;else hi=mid;}const c=lo===0?a[0]:lo===a.length?a[a.length-1]:target-a[lo-1].x<=a[lo].x-target?a[lo-1]:a[lo];chosen.push({series,point:c});if(!nearest||Math.abs(c.x-target)<Math.abs(nearest.x-target))nearest=c;}
+   if(!nearest){this.tooltip.hidden=true;return;}const lines=['最近记录 · '+time(nearest.x,spec.utc,true)];
+   for(const item of chosen){const p=item.point;if(Math.abs(p.x-nearest.x)>1)continue;lines.push(item.series.name+'  '+fmt(p.y,3)+(item.series.unit||spec.unit?' '+(item.series.unit||spec.unit):''));if(item.series.band&&finite(p.low)&&finite(p.high))lines.push('观测范围 '+fmt(p.low,3)+' ～ '+fmt(p.high,3));}
+   if(nearest.meta)lines.push(nearest.meta);
+   const ctx=this.canvas.getContext('2d');ctx.setTransform(this.dpr,0,0,this.dpr,0,0);const cx=plot.x+(nearest.x-plot.min)/(plot.max-plot.min)*plot.w;ctx.strokeStyle='#94a4af';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(cx,plot.y);ctx.lineTo(cx,plot.y+plot.h);ctx.stroke();ctx.setLineDash([]);this.tooltipLines(lines,event);
+  }else{
+   const hit=this.hits.findLast?this.hits.findLast(h=>x>=h.x&&x<=h.x+h.w&&y>=h.y&&y<=h.y+h.h):this.hits.slice().reverse().find(h=>x>=h.x&&x<=h.x+h.w&&y>=h.y&&y<=h.y+h.h);
+   if(!hit){this.tooltip.hidden=true;return;}
+   if(hit.item){const item=hit.item;this.tooltipLines([item.label,time(item.start,spec.utc)+' ～ '+time(item.end,spec.utc),item.meta||'记录状态摘要，不代表片段内的精确连通情况'],event);}
+   else{const bar=hit.bar,lines=[bar.label,fmt(this.barTotal(bar),3)+(spec.unit?' '+spec.unit:'')];if(bar.parts)for(const part of bar.parts)lines.push(part.name+'  '+fmt(part.value,2));if(bar.note)lines.push(bar.note);this.tooltipLines(lines,event);}
+  }
+ }
+ destroy(){cancelAnimationFrame(this.frame);if(this.observer)this.observer.disconnect();else window.removeEventListener('resize',this.onResize);this.canvas.removeEventListener('pointermove',this.onMove);this.canvas.removeEventListener('pointerleave',this.onLeave);this.canvas.removeEventListener('blur',this.onLeave);this.host.replaceChildren();}
+}
+window.DM=Object.freeze({el,text,num,fmt,integer:v=>fmt(v,0),duration,bytes,time,tickTime,inputTime,parseInput,readText,parseCSV,nextFrame,debounce,fillSelect,notice,download,exportCSV,Chart,palette});
+})();
+
+</script>
+<script>
+(() => {
+  'use strict';
+  const D = window.DM;
+  const showNotice = (message, tone) => D.notice(message, tone, 'csv-notice');
+  const MAX_ROWS = 100000, MAX_ENERGY_ROWS = 50000, MAX_SNAPSHOT_ROWS = 4096, MAX_ENERGY_SCOPES = 128, MAX_FILE = 32 * 1024 * 1024, MAX_BYTES = 96 * 1024 * 1024;
+  const METRICS = [
+    {id:'input_power_w',label:'输入功率',unit:'W',color:'#16756f'},
+    {id:'fan_speed_rpm',label:'风扇转速',unit:'RPM',color:'#3f799d'},
+    {id:'temperature_low_c',label:'低压侧温度',unit:'℃',color:'#16756f'},
+    {id:'input_voltage_v',label:'输入电压',unit:'V',color:'#3f799d'},
+    {id:'rail_3v3_v',label:'+3.3V',unit:'V',nominal:3.3,color:'#16756f'},
+    {id:'rail_5v_v',label:'+5V',unit:'V',nominal:5,color:'#3f799d'},
+    {id:'rail_12v_v',label:'+12V',unit:'V',nominal:12,color:'#b47d35'},
+    {id:'rail_5v_sb_v',label:'+5V SB',unit:'V',nominal:5,color:'#8b718f'},
+    {id:'input_frequency_hz',label:'输入频率',unit:'Hz',color:'#3f799d'},
+    {id:'temperature_high_c',label:'高压区温度',unit:'℃',color:'#b47d35'},
+    {id:'temperature_environment_c',label:'环境温度',unit:'℃',color:'#758499'}
+  ];
+  const SUFFIXES = ['mean','min','max','last','valid_ms'];
+  const STATE = {
+    connected:{label:'已连接摘要',color:'#16756f'},
+    waiting:{label:'等待数据',color:'#b2a375'},
+    connecting:{label:'连接中',color:'#94a6b3'},
+    disabled:{label:'采集关闭',color:'#a8afb7'},
+    stale:{label:'区间末数据过期',color:'#b47d35'},
+    disconnected:{label:'连接断开',color:'#b67869'},
+    suspended:{label:'休眠暂停',color:'#8b8194'},
+    stopped:{label:'已停止',color:'#a8afb7'},
+    fatal_error:{label:'后台错误',color:'#b45d50'}
+  };
+  const ids = ['file-input','import-button','clear-button','drop-zone','import-title','file-summary','file-list',
+    'import-diagnostics','diagnostics-title','diagnostics-list','device-filter','session-filter','timezone-filter',
+    'range-start','range-end','apply-range','all-range','export-button','kpi-power','kpi-peak','kpi-energy',
+    'kpi-duration','kpi-power-note','kpi-energy-note','kpi-duration-note','analysis-note','quality-summary',
+    'rail-mode','mains-mode','table-summary','quality-filter','record-search','records-body','previous-page',
+    'next-page','page-label','page-size','record-dialog','close-dialog','record-facts','metric-details','raw-details',
+    'energy-scope','energy-month','energy-year','energy-export','energy-asof','energy-today','energy-today-note',
+    'energy-month-total','energy-month-note','energy-year-total','energy-year-note','energy-note','energy-table-body'];
+  const ui = Object.fromEntries(ids.map(id => [id,D.el(id)]));
+  const charts = {
+    power:new D.Chart('power-chart'),temperature:new D.Chart('temperature-chart'),fan:new D.Chart('fan-chart'),
+    rails:new D.Chart('rails-chart'),mains:new D.Chart('mains-chart'),
+    distribution:new D.Chart('distribution-chart'),state:new D.Chart('state-chart'),
+    energyDays:new D.Chart('energy-days-chart'),energyMonths:new D.Chart('energy-months-chart')
+  };
+  const state = {
+    rows:[], byKey:new Map(), files:new Map(), bytes:0, issues:[], issueOverflow:0,
+    duplicates:0, conflicts:0, rejected:0, sourceSequence:0, busy:false, utc:false, rangeStart:null, rangeEnd:null,
+    rangeMode:'all', page:1, pageSize:50, firstSelection:true, selectedRows:[], tableRows:[],
+    energyRows:new Map(), energyModels:new Map(), energyWarnings:new Set(), energyAutoPeriod:true, energyScopePinned:false
+  };
+
+  function node(tag,text,className) {
+    const element=document.createElement(tag);
+    if(text !== undefined)element.textContent=String(text);
+    if(className)element.className=className;
+    return element;
+  }
+  function addIssue(message) {
+    if(state.issues.length<200)state.issues.push(String(message));
+    else state.issueOverflow++;
+  }
+  function get(row,name) {
+    const index=row.columnMap.get(name);
+    return index===undefined?'':row.values[index];
+  }
+  function value(row,metric,suffix=0) {
+    const number=row.numbers[metric*5+suffix];
+    return Number.isFinite(number)?number:null;
+  }
+  function hasMean(row,metric) {
+    return value(row,metric,0)!==null && value(row,metric,4)!==null && value(row,metric,4)>0;
+  }
+  function short(text,max=16) {
+    const string=String(text);
+    return string.length>max?string.slice(0,max-1)+'…':string;
+  }
+  function identityLabel(id) {
+    if(!id || id==='unselected')return '未归属身份';
+    if(id.startsWith('psu:'))return 'PSU · '+short(id.slice(4),16);
+    if(id.startsWith('usb:'))return 'USB · '+short(id.slice(4),16);
+    return short(id,24);
+  }
+  function stateLabel(name) {return Object.hasOwn(STATE,name)?STATE[name].label:(name||'未知状态');}
+  function numericCounter(raw) {
+    const n=D.num(raw);
+    return n!==null && n>=0?n:0;
+  }
+  function parseStamp(raw) {
+    if(typeof raw!=='string')return null;
+    const match=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-](\d{2}):(\d{2}))$/i.exec(raw);
+    if(!match)return null;
+    const year=Number(match[1]),month=Number(match[2]),day=Number(match[3]);
+    const days=[31,year%4===0&&(year%100!==0||year%400===0)?29:28,31,30,31,30,31,31,30,31,30,31];
+    if(month<1||month>12||day<1||day>days[month-1]||Number(match[4])>23||Number(match[5])>59||Number(match[6])>59)return null;
+    if(match[8]!==undefined&&(Number(match[8])>23||Number(match[9])>59))return null;
+    const time=Date.parse(raw);
+    return Number.isFinite(time)?time:null;
+  }
+
+  function periodDate(raw, monthOnly=false) {
+    const s=String(raw||'').trim();
+    if(monthOnly)return /^\d{4}-(0[1-9]|1[0-2])$/.test(s)?s:null;
+    return /^\d{4}-\d{2}-\d{2}$/.test(s)&&parseStamp(s+'T00:00:00Z')!==null?s:null;
+  }
+  function revisionValue(raw) {
+    const value=String(raw||'').trim().replace(/^0+(?=\d)/,'');
+    if(!/^\d{1,20}$/.test(value)||(value.length===20&&value>'18446744073709551615'))throw new Error('电量修订号无效');
+    return value;
+  }
+  function compareRevision(a,b) {return a.length-b.length||(a<b?-1:a>b?1:0);}
+  function energyIssue(key,message) {
+    if(state.energyWarnings.has(key))return;
+    if(state.energyWarnings.size<500)state.energyWarnings.add(key);
+    addIssue(message);
+  }
+  function parseEnergy(row) {
+    const scope=get(row,'energy_scope_id').trim(),type=row.type;
+    if(!scope&&type==='telemetry')return null;
+    if(!scope||scope.length>512)throw new Error('电量设备标识缺失或过长');
+    const period=periodDate(get(row,'energy_period'),type==='energy_month');
+    if(!period)throw new Error('电量统计期间无效');
+    const updated=parseStamp(get(row,'energy_updated_utc'));
+    if(updated===null)throw new Error('电量汇总时间无效');
+    const revision=revisionValue(get(row,'energy_revision'));
+    const flag=type==='energy_snapshot'?'false':get(row,'energy_has_data').trim().toLowerCase();
+    if(!['true','false'].includes(flag))throw new Error('电量有效性标记无效');
+    const hasData=flag==='true',rawAmount=D.num(get(row,'energy_kwh'));
+    if(hasData&&(rawAmount===null||rawAmount<0))throw new Error('有效电量缺少非负数值');
+    const coverage=D.num(get(row,'energy_valid_ms')),validMs=type==='energy_snapshot'&&coverage===null?0:coverage;
+    if(validMs===null||!Number.isSafeInteger(validMs)||validMs<0)throw new Error('电量有效覆盖时长无效');
+    const running={};
+    for(const field of ['today','month','year']) {
+      const raw=get(row,'energy_'+field+'_kwh'),value=D.num(raw);
+      if(raw.trim()&&(value===null||value<0))throw new Error('电量累计值无效：'+field);
+      running[field]=value;
+    }
+    const snapshot=get(row,'energy_snapshot_id').trim();
+    if(type!=='telemetry'&&(!snapshot||snapshot.length>512))throw new Error('电量快照标识缺失或过长');
+    let expected=null;
+    if(type==='energy_snapshot') {
+      expected=D.num(get(row,'energy_snapshot_rows'));
+      if(expected===null||!Number.isSafeInteger(expected)||expected<0||expected>MAX_SNAPSHOT_ROWS)throw new Error('电量快照汇总行数无效或超过 '+MAX_SNAPSHOT_ROWS);
+    }
+    return {scope,period,kwh:hasData?rawAmount:null,validMs,hasData,finalized:get(row,'energy_finalized').trim().toLowerCase()==='true',
+      quality:get(row,'energy_quality').trim()||'estimated_partial',updated,updatedRaw:get(row,'energy_updated_utc'),
+      revision,snapshot,expected,running};
+  }
+
+  function equivalent(first,second) {
+    if(first.headers.length!==second.headers.length)return false;
+    for(const h of first.headers)if(!second.columnMap.has(h)||get(first,h)!==get(second,h))return false;
+    return true;
+  }
+  function normalized(parsed,source) {
+    const headers=parsed.headers, columnMap=new Map(headers.map((h,i)=>[h,i]));
+    const required=['schema_version','agent_instance_id','record_sequence','device_id','period_start_utc','period_end_utc',
+      'input_power_w_mean','input_power_w_valid_ms'];
+    const missing=required.filter(h=>!columnMap.has(h));
+    if(missing.length)throw new Error('不是受支持的 DM Agent CSV，缺少列：'+missing.join('、'));
+    const metricColumns=METRICS.map(m=>SUFFIXES.map(s=>columnMap.get(m.id+'_'+s)));
+    const countMissing=metricColumns.flat().filter(i=>i===undefined).length;
+    if(countMissing)addIssue(source.name+'：缺少 '+countMissing+' 个指标统计列，相关字段保留为空。');
+    return {headers,columnMap,metricColumns};
+  }
+  function makeRecord(parsedRow,layout,source) {
+    const row={values:parsedRow.values,headers:layout.headers,columnMap:layout.columnMap,source,line:parsedRow.line};
+    row.schema=get(row,'schema_version').trim();
+    if(!['1','2'].includes(row.schema))throw new Error('不支持的 CSV 版本 '+row.schema);
+    row.type=row.schema==='1'?'telemetry':get(row,'record_type').trim();
+    if(!['telemetry','energy_day','energy_month','energy_snapshot'].includes(row.type))throw new Error('未知记录类型 '+row.type);
+    row.agent=get(row,'agent_instance_id').trim();
+    row.sequence=get(row,'record_sequence').trim();
+    if(!row.agent || !/^\d+$/.test(row.sequence))throw new Error('缺少运行实例或记录序号');
+    row.device=get(row,'device_id').trim()||'unselected';
+    row.session=get(row,'device_session_id').trim();
+    row.sessionKey=JSON.stringify([row.agent,row.session]);
+    row.key=JSON.stringify([row.schema,row.agent,row.sequence.replace(/^0+(?=\d)/,'')]);
+    row.energy=null;
+    if(row.type!=='telemetry') {row.energy=parseEnergy(row);return row;}
+    if(row.schema==='2') {
+      try {row.energy=parseEnergy(row);} catch(error) {addIssue(source.name+' 第 '+row.line+' 行：'+error.message+'；采样仍保留，电量扩展未使用。');}
+    }
+    row.start=parseStamp(get(row,'period_start_utc'));
+    row.end=parseStamp(get(row,'period_end_utc'));
+    if(row.start===null || row.end===null || row.end<row.start)throw new Error('实际区间时间无效或结束早于开始');
+    row.state=get(row,'connection_state').trim();
+    row.partial=get(row,'partial').trim().toLowerCase()==='true';
+    row.reason=get(row,'gap_reason');
+    row.sampleCount=numericCounter(get(row,'sample_count'));
+    row.rejected=numericCounter(get(row,'rejected_candidates'));
+    row.dropped=D.num(get(row,'dropped_rows_total'));
+    row.fault=D.num(get(row,'fault_code_last_u16'));
+    row.nonzeroFault=get(row,'fault_nonzero_seen').trim().toLowerCase()==='true'||(row.fault!==null&&row.fault!==0);
+    row.numbers=new Float64Array(METRICS.length*5);
+    row.numbers.fill(NaN);
+    for(let m=0;m<METRICS.length;m++)for(let p=0;p<5;p++) {
+      const column=layout.metricColumns[m][p];
+      if(column===undefined)continue;
+      const n=D.num(row.values[column]);
+      if(n!==null)row.numbers[m*5+p]=n;
+    }
+    row.issue=row.state!=='connected'||!hasMean(row,0)||row.nonzeroFault||row.rejected>0;
+    return row;
+  }
+  function setBusy(busy) {
+    state.busy=busy;
+    ui['import-button'].disabled=busy;
+    ui['file-input'].disabled=busy;
+    ui['clear-button'].disabled=busy||(state.files.size===0&&state.issues.length===0&&state.issueOverflow===0);
+    ui['export-button'].disabled=busy||state.selectedRows.length===0;
+    ui['energy-export'].disabled=busy||!state.energyModels.size;
+    ui['drop-zone'].setAttribute('aria-busy',String(busy));
+  }
+  async function importFiles(fileList) {
+    if(state.busy)return;
+    const files=Array.from(fileList||[]);
+    if(!files.length)return;
+    setBusy(true);
+    let acceptedFiles=0, acceptedRows=0, acceptedEnergy=0, failed=0;
+    const beforeIssueCount=state.issues.length+state.issueOverflow;
+    try {
+      for(let fileIndex=0;fileIndex<files.length;fileIndex++) {
+        const file=files[fileIndex];
+        showNotice('正在读取 '+(fileIndex+1)+' / '+files.length+'：'+file.name,'info');
+        await D.nextFrame();
+        try {
+          if(!/\.csv$/i.test(file.name))throw new Error('只接受 .csv 文件');
+          if(file.size>MAX_FILE)throw new Error('单文件超过 32 MiB，请分批导出');
+          // 文件元数据不能证明内容相同；每次读取后按记录主键去重。
+          const content=await D.readText(file);
+          const parsed=await D.parseCSV(content.text,{maxRows:MAX_ROWS+MAX_ENERGY_ROWS,maxColumns:256});
+          const source={name:file.name,key:'csv-source-'+(++state.sourceSequence),size:file.size,encoding:content.encoding,accepted:0,duplicates:0,rejected:0};
+          const layout=normalized(parsed,source);
+          const staged=new Map(),stagedEnergy=new Map();
+          let duplicates=0, conflicts=0, rejected=0;
+          for(let i=0;i<parsed.rows.length;i++) {
+            const raw=parsed.rows[i];
+            try {
+              const row=makeRecord(raw,layout,source);
+              const existing=staged.get(row.key)||stagedEnergy.get(row.key)||state.byKey.get(row.key)||state.energyRows.get(row.key);
+              if(existing) {
+                duplicates++;
+                if(!equivalent(existing,row)) {
+                  conflicts++;
+                  addIssue(source.name+' 第 '+raw.line+' 行：主键内容冲突，保留先导入记录。');
+                }
+              } else (row.type==='telemetry'?staged:stagedEnergy).set(row.key,row);
+            } catch(error) {
+              rejected++;
+              addIssue(source.name+' 第 '+raw.line+' 行：'+error.message+'，此行未参与分析。');
+            }
+            if(i>0 && i%2000===0)await D.nextFrame();
+          }
+          if(state.byKey.size+staged.size>MAX_ROWS)throw new Error('采样记录超过 100,000 条，本文件未并入，请缩小文件批次');
+          if(state.energyRows.size+stagedEnergy.size>MAX_ENERGY_ROWS)throw new Error('电量汇总记录超过 50,000 条，本文件未并入，请分批查看');
+          for(const issue of parsed.issues||[])addIssue(source.name+'：'+issue);
+          if(parsed.unterminated||content.unterminated)addIssue(source.name+'：末尾未以换行结束，可能正在写入；请核对导入诊断，必要时重新导入完整文件。');
+          if(staged.size===0&&stagedEnergy.size===0) {
+            state.duplicates+=duplicates;state.conflicts+=conflicts;state.rejected+=rejected;
+            addIssue(source.name+'：没有可新增的记录；重复 '+D.integer(duplicates)+' 条、无效 '+D.integer(rejected)+' 条，未增加来源文件。');
+            continue;
+          }
+          if(state.files.size>=128)throw new Error('本页最多保留 128 个来源文件，请清空后分批查看');
+          if(state.bytes+file.size>MAX_BYTES)throw new Error('累计来源大小超过 96 MiB，请清空后分批查看');
+          for(const [key,row] of staged)state.byKey.set(key,row);
+          for(const [key,row] of stagedEnergy)state.energyRows.set(key,row);
+          source.accepted=staged.size;source.summaries=stagedEnergy.size;source.duplicates=duplicates;source.rejected=rejected;
+          state.files.set(source.key,source);
+          state.bytes+=file.size;state.duplicates+=duplicates;state.conflicts+=conflicts;state.rejected+=rejected;
+          acceptedFiles++;acceptedRows+=staged.size;acceptedEnergy+=stagedEnergy.size;
+        } catch(error) {
+          failed++;
+          addIssue(file.name+'：'+(error&&error.message?error.message:String(error)));
+        }
+      }
+      state.rows=Array.from(state.byKey.values()).sort((a,b)=>a.start-b.start||a.end-b.end||a.key.localeCompare(b.key));
+      rebuildEnergyModels();rebuildEnergyOptions();
+      rebuildOptions();
+      renderAll(true);
+      const issueCount=state.issues.length+state.issueOverflow-beforeIssueCount;
+      showNotice('已并入 '+acceptedFiles+' 个文件、'+D.integer(acceptedRows)+' 条新采样、'+D.integer(acceptedEnergy)+' 条电量汇总；重复 '+D.integer(state.duplicates)+' 条已跳过。'+(failed?' '+failed+' 个文件未导入。':'')+(issueCount?' 详情见导入诊断。':''),failed||issueCount?'warn':'info');
+    } catch(error) {
+      showNotice('导入中断：'+(error&&error.message?error.message:String(error))+'。已成功并入的数据仍保留。','error');
+      state.rows=Array.from(state.byKey.values()).sort((a,b)=>a.start-b.start||a.end-b.end);
+      rebuildEnergyModels();rebuildEnergyOptions();rebuildOptions();renderAll(true);
+    } finally {
+      ui['file-input'].value='';
+      setBusy(false);
+    }
+  }
+
+  function energyModel(key,scope,mode) {
+    let model=state.energyModels.get(key);
+    if(model)return model;
+    if(state.energyModels.size>=MAX_ENERGY_SCOPES) {
+      energyIssue('scope-limit','电量来源超过 128 个，额外来源未建立图表，请缩小导入范围。');
+      return null;
+    }
+    model={key,scope,mode,days:new Map(),months:new Map(),years:new Map(),groups:[],incomplete:[],telemetry:[],
+      completeIds:new Set(),asof:null,latestComplete:null,blockedRevision:null,ambiguous:false,legacyRows:[]};
+    state.energyModels.set(key,model);return model;
+  }
+  function pointOrder(a,b) {
+    return compareRevision(a.revision,b.revision)||(a.updated-b.updated)||(a.period<b.period?-1:a.period>b.period?1:0);
+  }
+  function pointFrom(row,extra={}) {
+    const e=row.energy;
+    return {period:e.period,kwh:e.kwh,validMs:e.validMs,hasData:e.hasData,finalized:e.finalized,quality:e.quality,
+      revision:e.revision,updated:e.updated,updatedRaw:e.updatedRaw,source:row.source.name,line:row.line,
+      from:'snapshot',coverageExact:true,...extra};
+  }
+  function setEnergyPoint(map,key,point,model) {
+    const previous=map.get(key);
+    if(previous&&compareRevision(previous.revision,point.revision)===0&&
+       (previous.hasData!==point.hasData||previous.kwh!==point.kwh||
+       (previous.coverageExact&&point.coverageExact&&previous.validMs!==point.validMs))) {
+      energyIssue('conflict:'+model.key+':'+key+':'+point.revision,
+        '电量来源 '+identityLabel(model.scope)+' 的 '+key+' 在相同修订号下内容冲突，保留先导入值。');
+      return;
+    }
+    if(!previous||pointOrder(point,previous)>0)map.set(key,point);
+  }
+  function markAsof(model,point) {if(!model.asof||pointOrder(point,model.asof)>0)model.asof=point;}
+  function rebuildEnergyModels() {
+    state.energyModels=new Map();
+    const groups=new Map();
+    for(const row of state.energyRows.values()) {
+      const e=row.energy,key=JSON.stringify([e.scope,e.snapshot]);
+      let group=groups.get(key);
+      if(!group) {group={key,scope:e.scope,id:e.snapshot,parts:[],seals:[],rows:[]};groups.set(key,group);}
+      group.rows.push(row);
+      (row.type==='energy_snapshot'?group.seals:group.parts).push(row);
+    }
+    for(const group of groups.values()) {
+      const model=energyModel('v2:'+group.scope,group.scope,'v2');if(!model)continue;
+      const seal=group.seals[0],e=seal&&seal.energy;
+      const distinct=new Set(group.parts.map(row=>row.type+':'+row.energy.period));
+      let complete=!!seal&&group.parts.length===e.expected&&distinct.size===group.parts.length&&
+        group.parts.length<=MAX_SNAPSHOT_ROWS&&group.seals.every(row=>row.energy.expected===e.expected&&
+          row.energy.revision===e.revision&&row.energy.updated===e.updated&&row.energy.period===e.period)&&
+        group.parts.every(row=>row.energy.revision===e.revision&&row.energy.updated===e.updated)&&
+        group.parts.filter(row=>row.type==='energy_day').every(row=>row.energy.period.slice(0,7)===e.period.slice(0,7));
+      if(!complete) {
+        model.incomplete.push(group);
+        energyIssue('snapshot:'+group.key,'电量快照 '+short(group.id,32)+' 不完整或内容不一致，未用于历史统计；请导入写入完成的 CSV。');
+        continue;
+      }
+      group.seal=seal;model.groups.push(group);model.completeIds.add(group.id);
+      const asof=pointFrom(seal);
+      if(!model.latestComplete||pointOrder(asof,model.latestComplete)>0)model.latestComplete=asof;
+      markAsof(model,asof);
+      for(const row of group.parts)setEnergyPoint(row.type==='energy_day'?model.days:model.months,
+        row.energy.period,pointFrom(row),model);
+    }
+    for(const row of state.rows)if(row.schema==='2'&&row.energy) {
+      const model=energyModel('v2:'+row.energy.scope,row.energy.scope,'v2');
+      if(model)model.telemetry.push(row);
+    }
+    for(const model of state.energyModels.values()) {
+      for(const group of model.incomplete) {
+        let revision=null;
+        for(const row of group.rows)if(revision===null||compareRevision(row.energy.revision,revision)<0)revision=row.energy.revision;
+        if(revision!==null&&(!model.latestComplete||compareRevision(revision,model.latestComplete.revision)>0)&&
+           (model.blockedRevision===null||compareRevision(revision,model.blockedRevision)<0))model.blockedRevision=revision;
+      }
+      const baseDays=new Map(model.days),baseMonths=new Map(model.months),dayCoverage=new Map(),monthCoverage=new Map();
+      const latestDays=new Map(),latestMonths=new Map();
+      for(const row of model.telemetry) {
+        const e=row.energy;
+        if(model.blockedRevision!==null&&compareRevision(e.revision,model.blockedRevision)>=0)continue;
+        const period=e.period,month=period.slice(0,7),year=period.slice(0,4);
+        const baseDay=baseDays.get(period),baseMonth=baseMonths.get(month);
+        if(e.hasData&&e.validMs>0) {
+          if(!baseDay||compareRevision(e.revision,baseDay.revision)>0)dayCoverage.set(period,(dayCoverage.get(period)||0)+e.validMs);
+          if(!baseMonth||compareRevision(e.revision,baseMonth.revision)>0)monthCoverage.set(month,(monthCoverage.get(month)||0)+e.validMs);
+        }
+        const latest=pointFrom(row,{from:'running',coverageExact:false});
+        markAsof(model,latest);
+        if(e.running.today!==null) {
+          const point={...latest,kwh:e.running.today,hasData:true,finalized:false};
+          setEnergyPoint(latestDays,period,point,model);
+        }
+        if(e.running.month!==null) {
+          const point={...latest,period:month,kwh:e.running.month,hasData:true,finalized:false};
+          setEnergyPoint(latestMonths,month,point,model);
+        }
+        if(e.running.year!==null)setEnergyPoint(model.years,year,{...latest,period:year,kwh:e.running.year,hasData:true,finalized:false},model);
+      }
+      for(const [period,point] of latestDays) {
+        const base=baseDays.get(period);
+        point.validMs=(base?base.validMs:0)+(dayCoverage.get(period)||0);
+        if(!Number.isSafeInteger(point.validMs))point.validMs=null;
+        setEnergyPoint(model.days,period,point,model);
+      }
+      for(const [period,point] of latestMonths) {
+        const base=baseMonths.get(period);
+        point.validMs=(base?base.validMs:0)+(monthCoverage.get(period)||0);
+        if(!Number.isSafeInteger(point.validMs))point.validMs=null;
+        setEnergyPoint(model.months,period,point,model);
+      }
+    }
+    const legacyGroups=new Map();
+    for(const row of state.rows)if(row.schema==='1') {
+      if(!legacyGroups.has(row.device))legacyGroups.set(row.device,[]);
+      legacyGroups.get(row.device).push(row);
+    }
+    for(const [scope,rows] of legacyGroups) {
+      const model=energyModel('v1:'+scope,scope,'legacy');if(!model)continue;
+      model.legacyRows=rows;
+      const stats=analyze(rows);
+      model.ambiguous=stats.ambiguous||stats.powerRows.some(row=>value(row,0,0)<0);
+      for(const row of rows) {
+        const local=get(row,'minute_start_local'),period=periodDate(local.slice(0,10));
+        if(!period) {
+          energyIssue('legacy-date:'+row.source.key,'旧版 CSV '+row.source.name+' 缺少可靠的本地日期，相关行未分配到日／月电量。');
+          continue;
+        }
+        const asof={period,revision:'0',updated:row.end,updatedRaw:get(row,'period_end_utc'),source:row.source.name,line:row.line};
+        markAsof(model,asof);
+        if(model.ambiguous||!hasMean(row,0))continue;
+        const amount=value(row,0,0)*value(row,0,4)/3600000000;
+        if(!Number.isFinite(amount)||amount<0) {model.ambiguous=true;continue;}
+        const previous=model.days.get(period),validMs=(previous?previous.validMs:0)+value(row,0,4);
+        const kwh=(previous?previous.kwh:0)+amount;
+        if(!Number.isFinite(kwh)||!Number.isSafeInteger(validMs)){model.ambiguous=true;continue;}
+        model.days.set(period,{...asof,kwh,validMs,hasData:true,finalized:false,quality:'imported_only',from:'legacy',coverageExact:true});
+      }
+      if(model.ambiguous) {model.days.clear();continue;}
+      for(const point of model.days.values()) {
+        const month=point.period.slice(0,7),old=model.months.get(month);
+        model.months.set(month,{...point,period:month,kwh:(old?old.kwh:0)+point.kwh,
+          validMs:(old?old.validMs:0)+point.validMs});
+      }
+    }
+  }
+  function modelPeriods(model) {
+    const months=new Set(model.months.keys());
+    for(const period of model.days.keys())months.add(period.slice(0,7));
+    if(model.asof)months.add(model.asof.period.slice(0,7));
+    const monthList=Array.from(months).filter(month=>periodDate(month,true)).sort().reverse();
+    const years=Array.from(new Set(monthList.map(month=>month.slice(0,4)))).sort().reverse();
+    if(monthList.length>2400||years.length>200)energyIssue('period-limit:'+model.key,'电量选择器最多展示最近 200 年／2400 个月，请按来源分批查看更早汇总。');
+    return {months:monthList.slice(0,2400),years:years.slice(0,200)};
+  }
+  function selectedEnergyModel() {return state.energyModels.get(ui['energy-scope'].value)||null;}
+  function rebuildEnergyOptions() {
+    const previous=ui['energy-scope'].value;
+    const populated=model=>{
+      for(const point of model.days.values())if(point.hasData)return true;
+      for(const point of model.months.values())if(point.hasData)return true;
+      return false;
+    };
+    const models=Array.from(state.energyModels.values()).map(model=>({model,known:populated(model),
+      sampled:model.telemetry.some(row=>row.energy.hasData||row.energy.running.today!==null)}))
+      .sort((a,b)=>(a.model.mode==='v2'?0:1)-(b.model.mode==='v2'?0:1)||Number(b.known)-Number(a.known)||
+        Number(b.sampled)-Number(a.sampled)||(b.model.asof?b.model.asof.updated:-Infinity)-(a.model.asof?a.model.asof.updated:-Infinity)||
+        Number(b.model.scope.startsWith('psu:'))-Number(a.model.scope.startsWith('psu:'))||a.model.scope.localeCompare(b.model.scope))
+      .map(item=>item.model);
+    const options=models.map(model=>({value:model.key,label:(model.mode==='legacy'?'旧版导入范围 · ':'电量账本 · ')+identityLabel(model.scope)}));
+    if(!options.length)options.push({value:'',label:'尚无电量记录'});
+    const choice=state.energyScopePinned&&options.some(item=>item.value===previous)?previous:options[0].value;
+    if(choice!==previous)state.energyAutoPeriod=true;
+    D.fillSelect(ui['energy-scope'],options,choice);
+    const model=selectedEnergyModel();
+    if(!model) {
+      D.fillSelect(ui['energy-month'],[{value:'',label:'尚无月份'}],'');
+      D.fillSelect(ui['energy-year'],[{value:'',label:'尚无年份'}],'');
+    } else {
+      const periods=modelPeriods(model),asof=model.asof&&model.asof.period;
+      const month=state.energyAutoPeriod?(asof?asof.slice(0,7):periods.months[0]):ui['energy-month'].value;
+      const year=state.energyAutoPeriod?(asof?asof.slice(0,4):periods.years[0]):ui['energy-year'].value;
+      D.fillSelect(ui['energy-month'],periods.months.length?periods.months.map(value=>({value,label:value})):[{value:'',label:'尚无日历数据'}],periods.months.includes(month)?month:periods.months[0]);
+      D.fillSelect(ui['energy-year'],periods.years.length?periods.years.map(value=>({value,label:value+' 年'})):[{value:'',label:'尚无日历数据'}],periods.years.includes(year)?year:periods.years[0]);
+    }
+    for(const id of ['energy-scope','energy-month','energy-year'])ui[id].disabled=!model;
+    ui['energy-export'].disabled=state.busy||!model;
+  }
+  function energyStatus(point,period,model) {
+    if(!point||!point.hasData) return model&&model.asof&&period>model.asof.period.slice(0,period.length)?'统计日之后':'未携带有效汇总';
+    const asof=model&&model.asof?model.asof.period.slice(0,period.length):'';
+    if(asof&&period>asof)return '晚于统计日，需核对时钟';
+    const status=point.finalized||(asof&&period<asof)?'已结算':'累计中';
+    return status+(point.quality==='recovery_incomplete'?' · 恢复不完整':point.from==='legacy'?' · 仅导入范围':' · 已监测估算');
+  }
+  function energyNote(point,period,model) {
+    const lines=[period,energyStatus(point,period,model)];
+    if(point&&point.hasData)lines.push((point.coverageExact?'有效覆盖 ':'已知覆盖至少 ')+D.duration(point.validMs),
+      '截至 '+D.time(point.updated,state.utc)+'；'+point.source+' · 行 '+point.line);
+    else lines.push('未填零，不代表没有耗电');
+    return lines.join('；');
+  }
+  function energyBar(point,period,label,model) {
+    const present=!!point&&point.hasData&&Number.isFinite(point.kwh);
+    const accumulating=present&&!point.finalized&&model&&model.asof&&period===model.asof.period.slice(0,period.length);
+    return {label,value:present?point.kwh:null,missing:!present,color:present?(point.quality==='recovery_incomplete'?'#b47d35':accumulating?'#16756f':'#3f799d'):'#dbe2e7',
+      note:energyNote(point,period,model)};
+  }
+  function yearPoint(model,year) {
+    if(!model||!year)return null;
+    let sum=0,validMs=0,count=0,latest=null;
+    for(const [period,point] of model.months)if(period.startsWith(year+'-')&&point.hasData&&point.kwh!==null) {
+      sum+=point.kwh;validMs+=point.validMs||0;count++;
+      if(!latest||pointOrder(point,latest)>0)latest=point;
+    }
+    const running=model.years.get(year);
+    if(running&&(!latest||(compareRevision(running.revision,latest.revision)||(running.updated-latest.updated))>=0))return running;
+    if(!count||!Number.isFinite(sum))return null;
+    return {...latest,period:year,kwh:sum,validMs,hasData:true};
+  }
+  function renderEnergy() {
+    const model=selectedEnergyModel(),asof=model&&model.asof,month=ui['energy-month'].value,year=ui['energy-year'].value;
+    const day=asof&&model.days.get(asof.period),monthPoint=model&&model.months.get(month),yearTotal=yearPoint(model,year);
+    D.text(ui['energy-today'],day&&day.hasData?D.fmt(day.kwh,3):'—');
+    D.text(ui['energy-month-total'],monthPoint&&monthPoint.hasData?D.fmt(monthPoint.kwh,3):'—');
+    D.text(ui['energy-year-total'],yearTotal&&yearTotal.hasData?D.fmt(yearTotal.kwh,3):'—');
+    D.text(ui['energy-today-note'],asof?asof.period+' · '+energyStatus(day,asof.period,model):'导入最新 CSV 后显示');
+    D.text(ui['energy-month-note'],month?month+' · 已记录的估算用电':'按本地自然月汇总');
+    D.text(ui['energy-year-note'],year?year+' 年 · 已记录的估算用电':'按自然年各月累计');
+    D.text(ui['energy-asof'],asof?'统计日 '+asof.period+' · 最后结算 '+D.time(asof.updated,state.utc)+' · '+asof.source:'尚无可用电量数据');
+    let note='耗电统计使用独立设备和年月选择，不受下方分钟趋势的设备、会话或时间范围限制。';
+    if(model) {
+      note+=model.mode==='legacy'?' 当前为旧版 CSV 推算，仅覆盖已导入的有效分钟，不包含未导入历史。':' 当前使用文件内账本汇总和后续分钟累计，不重复相加累计列。';
+      if(model.ambiguous)note+=' 旧记录存在时间重叠、时钟／数值歧义，已暂停电量推算；请导入单一且无重叠的记录。';
+      if(model.incomplete.length)note+=' 有 '+D.integer(model.incomplete.length)+' 个不完整快照被忽略；保留此前完整汇总。';
+      if(model.mode==='v2'&&!model.groups.length&&!model.incomplete.length)note+=' 未携带完整历史快照，累计值可见，但日／月拆分可能缺失。';
+    }
+    note+=' 所有数值只代表已监测覆盖；已结算不等于全天完整测量，空白与真实 0 分开。';
+    D.text(ui['energy-note'],note);
+    const days=[],months=[],table=[];
+    if(model&&month&&periodDate(month,true)) {
+      const y=Number(month.slice(0,4)),m=Number(month.slice(5,7)),length=[31,y%4===0&&(y%100!==0||y%400===0)?29:28,31,30,31,30,31,31,30,31,30,31][m-1];
+      for(let i=1;i<=length;i++) {
+        const period=month+'-'+String(i).padStart(2,'0'),point=model.days.get(period);
+        days.push(energyBar(point,period,String(i)+'日',model));table.push({period,point});
+      }
+    }
+    if(model&&year)for(let i=1;i<=12;i++) {
+      const period=year+'-'+String(i).padStart(2,'0'),point=model.months.get(period);
+      months.push(energyBar(point,period,i+'月',model));table.push({period,point});
+    }
+    charts.energyDays.set({type:'histogram',title:'自然月每日估算用电',unit:'kWh',bars:days,emptyText:month?'该月未携带有效日汇总；可导入对应月份 CSV':'导入 CSV 后显示逐日电量'});
+    charts.energyMonths.set({type:'histogram',title:'自然年每月估算用电',unit:'kWh',bars:months,emptyText:'当前年份未携带有效月汇总'});
+    ui['energy-table-body'].replaceChildren();
+    for(const item of table) {
+      const point=item.point,tr=node('tr');
+      tr.append(cell(item.period),cell(point&&point.hasData?D.fmt(point.kwh,6):'—'),
+        cell(point&&point.hasData?(point.coverageExact?'':'至少 ')+D.duration(point.validMs):'—'),
+        cell(energyStatus(point,item.period,model)),cell(point?D.time(point.updated,state.utc)+' · '+point.source:'—'));
+      ui['energy-table-body'].append(tr);
+    }
+    if(!table.length) {const tr=node('tr'),td=cell('导入 CSV 后查看日／月汇总');td.colSpan=5;tr.append(td);ui['energy-table-body'].append(tr);}
+    ui['energy-export'].disabled=state.busy||!model;
+  }
+  function downloadRows(rows,filename) {
+    const headers=[],seen=new Set();
+    for(const row of rows)for(const header of row.headers)if(!seen.has(header)){headers.push(header);seen.add(header);}
+    const output=rows.map(row=>{
+      const result=Object.create(null);
+      for(const header of headers)result[header]=get(row,header);
+      return result;
+    });
+    D.exportCSV(headers,output,filename);
+  }
+  function exportEnergy() {
+    const model=selectedEnergyModel();if(!model||state.busy)return;
+    let rows;
+    if(model.mode==='legacy')rows=model.legacyRows;
+    else {
+      const ids=model.completeIds;
+      rows=Array.from(state.energyRows.values()).filter(row=>row.energy.scope===model.scope&&ids.has(row.energy.snapshot));
+      rows=rows.concat(model.telemetry.filter(row=>model.blockedRevision===null||compareRevision(row.energy.revision,model.blockedRevision)<0));
+    }
+    if(!rows.length) {showNotice('当前没有可导出的完整电量来源。','warn');return;}
+    downloadRows(rows,'dm-energy-'+(model.asof?model.asof.period:'records')+'.csv');
+    showNotice(model.mode==='legacy'?'已导出该旧版来源的全部已导入分钟；没有补造历史汇总。':
+      '已导出所选电量设备的完整快照、seal 与已导入后续累计；保留未知扩展列和恢复水位。不受下方分钟筛选影响。','info');
+  }
+
+  function baseRows() {
+    const device=ui['device-filter'].value,session=ui['session-filter'].value;
+    return state.rows.filter(row=>(device==='*'||row.device===device)&&(session==='*'||row.sessionKey===session));
+  }
+  function fillSessions(preferred='*') {
+    const device=ui['device-filter'].value;
+    const sessions=new Map();
+    for(const row of state.rows)if(device==='*'||row.device===device) {
+      const current=sessions.get(row.sessionKey)||{row,count:0};
+      current.count++;sessions.set(row.sessionKey,current);
+    }
+    const options=[{value:'*',label:'所有会话'}];
+    for(const [key,item] of sessions)options.push({value:key,label:'运行 '+short(item.row.agent.replace(/[{}]/g,''),8)+' / '+(item.row.session?short(item.row.session.replace(/[{}]/g,''),8):'未建立设备会话')+' · '+D.integer(item.count)+' 条'});
+    D.fillSelect(ui['session-filter'],options,options.some(o=>o.value===preferred)?preferred:'*');
+  }
+  function resetRange() {
+    const rows=baseRows();
+    if(!rows.length) {state.rangeStart=null;state.rangeEnd=null;ui['range-start'].value='';ui['range-end'].value='';return;}
+    state.rangeStart=Math.floor(rows[0].start/60000)*60000;
+    state.rangeEnd=Math.floor(rows[rows.length-1].start/60000)*60000+60000;
+    state.rangeMode='all';
+    showRangeControls();
+  }
+  function showRangeControls() {
+    ui['range-start'].value=state.rangeStart===null?'':D.inputTime(state.rangeStart,state.utc);
+    ui['range-end'].value=state.rangeEnd===null?'':D.inputTime(state.rangeEnd-60000,state.utc);
+  }
+  function rebuildOptions() {
+    const previous=ui['device-filter'].value, oldSession=ui['session-filter'].value;
+    const groups=new Map();
+    for(const row of state.rows) {
+      const group=groups.get(row.device)||{count:0,weight:0};
+      group.count++;if(hasMean(row,0))group.weight+=value(row,0,4);
+      groups.set(row.device,group);
+    }
+    const sorted=Array.from(groups.entries()).sort((a,b)=>b[1].weight-a[1].weight||b[1].count-a[1].count);
+    const options=[{value:'*',label:'所有身份（不合并统计）'}];
+    for(const [id,group] of sorted)options.push({value:id,label:identityLabel(id)+' · '+D.integer(group.count)+' 条'});
+    let choice=options.some(option=>option.value===previous)?previous:'*';
+    if(state.firstSelection && sorted.length) {choice=sorted[0][0];state.firstSelection=false;}
+    D.fillSelect(ui['device-filter'],options,choice);
+    fillSessions(oldSession);
+    if(state.rangeMode==='all')resetRange();
+    const disabled=state.rows.length===0;
+    for(const id of ['device-filter','session-filter','range-start','range-end','apply-range','all-range'])ui[id].disabled=disabled;
+  }
+  function selectedRows() {
+    return baseRows().filter(row=>(state.rangeStart===null||row.start>=state.rangeStart)&&(state.rangeEnd===null||row.start<state.rangeEnd));
+  }
+  function renderSources() {
+    D.text(ui['file-summary'],state.files.size?D.integer(state.files.size)+' 个文件 · '+D.integer(state.rows.length)+' 条采样 / '+D.integer(state.energyRows.size)+' 条汇总 · '+D.bytes(state.bytes):'尚未导入 CSV');
+    ui['file-list'].replaceChildren();
+    for(const source of state.files.values()) {
+      const item=node('li',undefined,'file-item');
+      const name=node('span',source.name);name.title=source.name;
+      const detail=node('span',D.integer(source.accepted)+' 条采样 / '+D.integer(source.summaries||0)+' 条汇总 · '+D.bytes(source.size)+' · '+source.encoding,'csv-file-meta');
+      item.append(name,detail);ui['file-list'].append(item);
+    }
+    D.text(ui['import-title'],state.files.size?'继续拖入 CSV，追加到当前记录':'拖入每日 CSV，或点击选择文件');
+    const count=state.issues.length+state.issueOverflow;
+    ui['import-diagnostics'].hidden=count===0;
+    D.text(ui['diagnostics-title'],'导入诊断 · '+D.integer(count)+' 项（仅列前 200 项）');
+    ui['diagnostics-list'].replaceChildren(...state.issues.map(issue=>node('li',issue)));
+  }
+  function analyze(rows) {
+    const powerRows=rows.filter(row=>hasMean(row,0));
+    const identities=new Set(powerRows.map(row=>row.device));
+    let totalMs=0, weighted=0, peak=null, overlapping=false, timingAmbiguous=false,lastEnd=-Infinity;
+    for(const row of rows) {
+      const maximum=value(row,0,2);
+      if(maximum!==null)peak=peak===null?maximum:Math.max(peak,maximum);
+    }
+    for(const row of powerRows) {
+      const ms=value(row,0,4);
+      totalMs+=ms;weighted+=value(row,0,0)*ms;
+      if(row.start<lastEnd-1)overlapping=true;
+      lastEnd=Math.max(lastEnd,row.end);
+      if(row.end<=row.start||ms>row.end-row.start+2000)timingAmbiguous=true;
+    }
+    const arithmeticInvalid=!Number.isFinite(totalMs)||!Number.isFinite(weighted);
+    const ambiguous=identities.size>1||overlapping||timingAmbiguous||arithmeticInvalid;
+    const partial=rows.filter(row=>row.partial).length;
+    const noPower=rows.length-powerRows.length;
+    const fault=rows.filter(row=>row.nonzeroFault).length;
+    const perAgent=new Map();
+    let rejected=0;
+    for(const row of rows) {
+      rejected+=row.rejected;
+      if(row.dropped!==null&&row.dropped>=0)perAgent.set(row.agent,Math.max(perAgent.get(row.agent)||0,row.dropped));
+    }
+    let dropped=0;for(const count of perAgent.values())dropped+=count;
+    return {powerRows,identities,totalMs,weighted,peak,overlapping,timingAmbiguous,arithmeticInvalid,ambiguous,partial,noPower,fault,rejected,dropped};
+  }
+  function badge(text,kind,title) {
+    const element=node('span',text,'badge '+(kind||''));
+    if(title)element.title=title;
+    return element;
+  }
+  function renderSummary(rows,stats) {
+    const usable=stats.totalMs>0&&!stats.ambiguous;
+    D.text(ui['kpi-power'],usable?D.fmt(stats.weighted/stats.totalMs,2):'—');
+    D.text(ui['kpi-peak'],stats.peak===null?'—':D.fmt(stats.peak,2));
+    D.text(ui['kpi-energy'],usable?D.fmt(stats.weighted/3600000,3):'—');
+    D.text(ui['kpi-duration'],usable?D.duration(stats.totalMs):'—');
+    const ambiguity=stats.identities.size>1?'选择了多个设备身份':stats.overlapping?'存在时间重叠的有效记录':stats.timingAmbiguous?'记录时钟与有效时长有歧义':stats.arithmeticInvalid?'数值超出可计算范围':'';
+    D.text(ui['kpi-power-note'],ambiguity||'按各行功率有效毫秒数加权');
+    D.text(ui['kpi-energy-note'],ambiguity?'请选择单一且无歧义的设备／会话':'仅积分已覆盖数据，不外推缺口');
+    D.text(ui['kpi-duration-note'],ambiguity?'不将重叠记录相加为覆盖率':'功率积分使用的累计有效时长');
+    let note=rows.length?'当前 '+D.integer(rows.length)+' 条完整记录，'+D.time(rows[0].start,state.utc)+' 至 '+D.time(bounds(rows).xmax,state.utc)+'。':'没有符合上方条件的记录。';
+    if(ambiguity)note+=' '+ambiguity+'，暂停加权均值、电量和分布统计，避免重复积分。';
+    else if(rows.length&&!stats.powerRows.length)note+=' 当前范围没有有效功率积分；空值不会补零。';
+    else if(rows.length)note+=' 图线连接的是区间均值；缺口不连线，部分区间不按全天补齐。';
+    D.text(ui['analysis-note'],note);
+    ui['quality-summary'].replaceChildren();
+    if(rows.length) {
+      ui['quality-summary'].append(badge(D.integer(stats.partial)+' 条分段／部分记录','','分段或覆盖不足不等于设备故障'),
+        badge(D.integer(stats.noPower)+' 条无功率覆盖',stats.noPower?'badge-warn':''),
+        badge(D.integer(stats.fault)+' 条观察到非零故障码',stats.fault?'badge-warn':'','仅展示原始记录，不解释故障位'),
+        badge(D.integer(stats.rejected)+' 个被拒候选',stats.rejected?'badge-warn':'','按各区间记录计数求和，不等同于物理坏帧数量'));
+      if(stats.dropped>0)ui['quality-summary'].append(badge('实例报告丢弃累计 '+D.integer(stats.dropped),'badge-warn','每个运行实例取最大值后相加；不是当前筛选时段的实际丢失量'));
+    }
+  }
+  function points(rows,metric,transform) {
+    let previous=null, previousValid=false;
+    const detailedHover=rows.length<=4000;
+    return rows.map(row=>{
+      const valid=hasMean(row,metric);
+      const ms=value(row,metric,4),duration=row.end-row.start;
+      const before=previous;
+      let split=!before||!previousValid||row.device!==before.device||row.sessionKey!==before.sessionKey||
+        row.start>before.end+1000||row.start<before.end-1||Boolean(row.reason);
+      if(before && value(before,metric,4)!==null && value(before,metric,4)<before.end-before.start-2)split=true;
+      if(ms!==null&&ms<duration-2)split=true;
+      previous=row;previousValid=valid;
+      const raw=valid?value(row,metric,0):null;
+      const apply=n=>n===null?null:transform?transform(n):n;
+      const point={x:row.start,y:apply(raw),breakBefore:split,
+        meta:detailedHover?D.time(row.start,state.utc)+' → '+D.time(row.end,state.utc)+'\n'+
+          METRICS[metric].label+'：'+D.fmt(raw,2)+' '+METRICS[metric].unit+
+          '；有效 '+(ms===null?'—':D.fmt(ms/1000,3))+' 秒'+(row.partial?'；部分区间':'')+
+          '\n'+row.source.name+' · 行 '+row.line:undefined};
+      point.low=valid?apply(value(row,metric,1)):null;
+      point.high=valid?apply(value(row,metric,2)):null;
+      return point;
+    });
+  }
+  function lineSeries(rows,index,options={}) {
+    return {name:METRICS[index].label,color:METRICS[index].color,unit:options.unit||METRICS[index].unit,
+      points:points(rows,index,options.transform),...options};
+  }
+  function bounds(rows) {
+    if(!rows.length)return {};
+    let maximum=rows[0].end;
+    for(const row of rows)maximum=Math.max(maximum,row.end);
+    return {xmin:rows[0].start,xmax:Math.max(maximum,rows[0].start+1000)};
+  }
+  function histogram(stats) {
+    const emptyText=stats.ambiguous?'请选择单一、无时间重叠且数值可计算的设备／会话':'没有有效功率覆盖数据';
+    if(stats.ambiguous||!stats.powerRows.length)return {bars:[],emptyText};
+    let low=Infinity,high=-Infinity;
+    for(const row of stats.powerRows){const p=value(row,0,0);low=Math.min(low,p);high=Math.max(high,p);}
+    const count=low===high?1:Math.min(16,Math.max(5,Math.ceil(Math.sqrt(stats.powerRows.length))));
+    const step=low===high?1:(high-low)/count;
+    if(!Number.isFinite(low)||!Number.isFinite(high)||!Number.isFinite(step)||step<=0)return {bars:[],emptyText:'数值跨度超出分布图计算范围，请检查原始字段'};
+    const bins=Array.from({length:count},(_,i)=>({label:count===1?D.fmt(low,2)+' W':D.fmt(low+i*step,1)+'–'+D.fmt(i===count-1?high:low+(i+1)*step,1)+' W',value:0,color:'#16756f',note:'按有效功率覆盖时长加权'}));
+    for(const row of stats.powerRows) {
+      const index=count===1?0:Math.min(count-1,Math.max(0,Math.floor((value(row,0,0)-low)/step)));
+      bins[index].value+=value(row,0,4)/60000;
+    }
+    return {bars:bins,emptyText};
+  }
+  function renderCharts(rows,stats) {
+    const base={...bounds(rows),utc:state.utc,emptyText:'导入并筛选 CSV 后显示图表'};
+    charts.power.set({...base,type:'line',title:'输入功率趋势',unit:'W',zero:true,series:[lineSeries(rows,0,{band:true})]});
+    charts.temperature.set({...base,type:'line',title:'三处温度',unit:'℃',series:[lineSeries(rows,2),lineSeries(rows,9),lineSeries(rows,10)]});
+    charts.fan.set({...base,type:'line',title:'风扇转速',unit:'RPM',zero:true,series:[lineSeries(rows,1,{step:true})]});
+    const percent=ui['rail-mode'].value==='percent';
+    charts.rails.set({...base,type:'line',title:'四路电压',unit:percent?'%':'V',zero:percent,series:[4,5,6,7].map(index=>lineSeries(rows,index,percent?{unit:'%',transform:n=>(n/METRICS[index].nominal-1)*100}:{}))});
+    const frequency=ui['mains-mode'].value==='frequency',mains=frequency?8:3;
+    charts.mains.set({...base,type:'line',title:METRICS[mains].label,unit:METRICS[mains].unit,series:[lineSeries(rows,mains)]});
+    charts.distribution.set({type:'histogram',title:'输入功率分布',unit:'有效分钟',...histogram(stats)});
+    charts.state.set({...base,type:'timeline',title:'记录状态摘要',intervals:rows.filter(row=>row.end>row.start).map(row=>({
+      start:row.start,end:row.end,label:stateLabel(row.state),color:Object.hasOwn(STATE,row.state)?STATE[row.state].color:'#9ba3aa',
+      meta:rows.length<=4000?D.time(row.start,state.utc)+' → '+D.time(row.end,state.utc)+'\n'+stateLabel(row.state)+(row.partial?' · 部分区间':'')+'\n区间摘要不表示每一时刻的精确连接状态':undefined
+    }))});
+  }
+  function filteredTableRows() {
+    const quality=ui['quality-filter'].value,query=ui['record-search'].value.trim().toLowerCase();
+    return state.selectedRows.filter(row=>{
+      if(quality==='issue'&&!row.issue)return false;
+      if(quality==='partial'&&!row.partial)return false;
+      if(quality==='fault'&&!row.nonzeroFault)return false;
+      if(query && !(row.device+' '+row.agent+' '+row.session+' '+row.reason+' '+row.source.name+' '+row.sequence).toLowerCase().includes(query))return false;
+      return true;
+    }).reverse();
+  }
+  function cell(text,title) {
+    const element=node('td',text);
+    if(title)element.title=title;
+    return element;
+  }
+  function renderTable(resetPage=false) {
+    if(resetPage)state.page=1;
+    state.tableRows=filteredTableRows();
+    const total=state.tableRows.length,pages=Math.ceil(total/state.pageSize);
+    state.page=Math.max(1,Math.min(state.page,pages||1));
+    const first=(state.page-1)*state.pageSize;
+    ui['records-body'].replaceChildren();
+    for(const row of state.tableRows.slice(first,first+state.pageSize)) {
+      const tr=node('tr');
+      tr.append(cell(D.time(row.start,state.utc),get(row,'period_start_utc')+' → '+get(row,'period_end_utc')));
+      for(const metric of [0,1,2,3])tr.append(cell(hasMean(row,metric)?D.fmt(value(row,metric,0),metric===1?1:2):'—'));
+      const valid=value(row,0,4);
+      tr.append(cell(valid!==null?D.fmt(valid/1000,3):'—'));
+      const flags=cell('');
+      flags.append(badge(stateLabel(row.state),row.state==='connected'?'badge-ok':''));
+      if(row.partial)flags.append(document.createTextNode(' '),badge('部分区间'));
+      if(row.nonzeroFault)flags.append(document.createTextNode(' '),badge('非零故障','badge-warn'));
+      tr.append(flags,cell(short(row.source.name,25)+' : '+row.line,row.source.name+' · 第 '+row.line+' 行'));
+      const action=cell(''),button=node('button','详情','button quiet small');button.type='button';
+      button.setAttribute('aria-label','查看 '+D.time(row.start,state.utc)+' 的记录详情');
+      button.addEventListener('click',()=>showRecord(row));action.append(button);tr.append(action);
+      ui['records-body'].append(tr);
+    }
+    if(!total) {const tr=node('tr'),td=cell('没有符合条件的记录');td.colSpan=9;td.className='csv-empty-cell';tr.append(td);ui['records-body'].append(tr);}
+    D.text(ui['table-summary'],D.integer(total)+' 条明细 · 最新在前 · 上方范围共 '+D.integer(state.selectedRows.length)+' 条');
+    D.text(ui['page-label'],'第 '+(pages?state.page:0)+' / '+pages+' 页');
+    ui['previous-page'].disabled=state.page<=1||pages===0;
+    ui['next-page'].disabled=state.page>=pages||pages===0;
+  }
+  function showRecord(row) {
+    const facts=[
+      ['实际开始',D.time(row.start,state.utc)],['实际结束',D.time(row.end,state.utc)],
+      ['原始本地分钟标签',get(row,'minute_start_local')||'—'],['功率有效覆盖',D.duration(value(row,0,4))],
+      ['设备身份',row.device],['运行实例／序号',row.agent+' / '+row.sequence],
+      ['设备会话',row.session||'未建立'],['元信息版本',get(row,'metadata_id')||'—'],
+      ['来源',row.source.name+' · 第 '+row.line+' 行'],['状态／分段原因',stateLabel(row.state)+' / '+(row.reason||'无')],
+      ['原始故障码',row.fault===null?'—':String(row.fault)+' (0x'+Math.trunc(row.fault).toString(16).toUpperCase()+')'],
+      ['协议观察状态',get(row,'rx_profile_validation')||'—']
+    ];
+    if(row.energy)facts.push(['电量设备',row.energy.scope],['本段估算电量',row.energy.hasData?D.fmt(row.energy.kwh,8)+' kWh':'—'],
+      ['当日累计',D.fmt(row.energy.running.today,6)+' kWh'],['累计修订号',row.energy.revision]);
+    ui['record-facts'].replaceChildren();
+    for(const [label,text] of facts){const block=node('div');block.append(node('dt',label),node('dd',text));ui['record-facts'].append(block);}
+    ui['metric-details'].replaceChildren();
+    METRICS.forEach((metric,index)=>{
+      const tr=node('tr');tr.append(cell(metric.label+' / '+metric.unit));
+      for(let s=0;s<4;s++)tr.append(cell(D.fmt(value(row,index,s),index===1?1:3)));
+      const ms=value(row,index,4);tr.append(cell(ms===null?'—':D.fmt(ms/1000,3)));ui['metric-details'].append(tr);
+    });
+    ui['raw-details'].replaceChildren();
+    row.headers.forEach((header,index)=>{
+      const tr=node('tr');tr.append(cell(header),cell(row.values[index]||'—'));ui['raw-details'].append(tr);
+    });
+    ui['record-dialog'].showModal();
+  }
+  function renderAll(resetPage=false) {
+    renderSources();renderEnergy();
+    state.selectedRows=selectedRows();
+    const stats=analyze(state.selectedRows);
+    renderSummary(state.selectedRows,stats);
+    renderCharts(state.selectedRows,stats);
+    renderTable(resetPage);
+    ui['export-button'].disabled=state.busy||state.selectedRows.length===0;
+    ui['clear-button'].disabled=state.busy||(state.files.size===0&&state.issues.length===0&&state.issueOverflow===0);
+  }
+  function applyRange() {
+    const start=ui['range-start'].value?D.parseInput(ui['range-start'].value,state.utc):null;
+    const end=ui['range-end'].value?D.parseInput(ui['range-end'].value,state.utc):null;
+    if((ui['range-start'].value&&start===null)||(ui['range-end'].value&&end===null)){showNotice('时间格式无效，请重新选择。','error');return;}
+    if(start!==null&&end!==null&&end<start){showNotice('结束分钟不能早于起始分钟。','error');return;}
+    state.rangeStart=start;state.rangeEnd=end===null?null:end+60000;state.rangeMode='custom';
+    showNotice('已按记录区间起点筛选；结束分钟内开始的记录均包含。','info');
+    renderAll(true);
+  }
+  function exportRows() {
+    const rows=state.selectedRows;if(!rows.length||state.busy)return;
+    downloadRows(rows,'dm-telemetry-filtered.csv');
+    showNotice('已导出下方设备、会话和时间范围的 '+D.integer(rows.length)+' 条分钟采样；此导出不含历史汇总，完整电量来源请用“导出电量 CSV”。源文件未改动。','info');
+  }
+  function clear() {
+    if(state.busy)return;
+    state.rows=[];state.byKey.clear();state.files.clear();state.bytes=0;state.issues=[];state.issueOverflow=0;
+    state.energyRows.clear();state.energyModels.clear();state.energyWarnings.clear();state.energyAutoPeriod=true;state.energyScopePinned=false;
+    state.duplicates=0;state.conflicts=0;state.rejected=0;state.sourceSequence=0;state.firstSelection=true;state.rangeMode='all';state.rangeStart=null;state.rangeEnd=null;
+    state.page=1;ui['record-search'].value='';ui['quality-filter'].value='all';
+    if(ui['record-dialog'].open)ui['record-dialog'].close();
+    rebuildEnergyOptions();rebuildOptions();renderAll(true);showNotice('');
+  }
+
+  ui['import-button'].addEventListener('click',()=>ui['file-input'].click());
+  ui['file-input'].addEventListener('change',()=>importFiles(ui['file-input'].files));
+  ui['clear-button'].addEventListener('click',clear);
+  ui['drop-zone'].addEventListener('click',()=>{if(!state.busy)ui['file-input'].click();});
+  ui['drop-zone'].addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&!state.busy){event.preventDefault();ui['file-input'].click();}});
+  for(const name of ['dragenter','dragover'])ui['drop-zone'].addEventListener(name,event=>{event.preventDefault();if(!state.busy)ui['drop-zone'].classList.add('is-dragover');});
+  for(const name of ['dragleave','drop'])ui['drop-zone'].addEventListener(name,event=>{event.preventDefault();ui['drop-zone'].classList.remove('is-dragover');});
+  ui['drop-zone'].addEventListener('drop',event=>importFiles(event.dataTransfer.files));
+  ui['device-filter'].addEventListener('change',()=>{fillSessions();resetRange();renderAll(true);});
+  ui['session-filter'].addEventListener('change',()=>{resetRange();renderAll(true);});
+  ui['timezone-filter'].addEventListener('change',()=>{state.utc=ui['timezone-filter'].value==='utc';showRangeControls();renderAll(false);});
+  ui['apply-range'].addEventListener('click',applyRange);
+  ui['all-range'].addEventListener('click',()=>{resetRange();showNotice('已显示当前身份／会话的全部时间。','info');renderAll(true);});
+  ui['export-button'].addEventListener('click',exportRows);
+  ui['energy-export'].addEventListener('click',exportEnergy);
+  ui['energy-scope'].addEventListener('change',()=>{state.energyScopePinned=true;state.energyAutoPeriod=true;rebuildEnergyOptions();renderEnergy();});
+  for(const id of ['energy-month','energy-year'])ui[id].addEventListener('change',()=>{state.energyAutoPeriod=false;renderEnergy();});
+  ui['quality-filter'].addEventListener('change',()=>renderTable(true));
+  ui['record-search'].addEventListener('input',D.debounce(()=>renderTable(true),180));
+  ui['page-size'].addEventListener('change',()=>{state.pageSize=Number(ui['page-size'].value)||50;renderTable(true);});
+  ui['previous-page'].addEventListener('click',()=>{state.page--;renderTable(false);});
+  ui['next-page'].addEventListener('click',()=>{state.page++;renderTable(false);});
+  ui['rail-mode'].addEventListener('change',()=>renderCharts(state.selectedRows,analyze(state.selectedRows)));
+  ui['mains-mode'].addEventListener('change',()=>renderCharts(state.selectedRows,analyze(state.selectedRows)));
+  ui['close-dialog'].addEventListener('click',()=>ui['record-dialog'].close());
+  // 防止拖入文件时浏览器直接导航离开；文件内容只交给显式导入入口。
+  window.addEventListener('dragover',event=>{if(event.dataTransfer&&Array.from(event.dataTransfer.types).includes('Files'))event.preventDefault();});
+  window.addEventListener('drop',event=>{if(event.dataTransfer&&event.dataTransfer.files.length)event.preventDefault();});
+  rebuildEnergyOptions();rebuildOptions();renderAll(true);
+})();
+
+</script>
+<script>
+(() => {
+  'use strict';
+  const D = window.DM;
+  const showNotice = (message, tone) => D.notice(message, tone, 'log-notice');
+  const MAX_FILE = 32 * 1024 * 1024, MAX_TOTAL = 64 * 1024 * 1024, MAX_EVENTS = 100000, MAX_FILES = 128;
+  const state = { files: [], records: [], base: [], filtered: [], page: 1, pageSize: 50, nextId: 1, order: 0, utc: false, busy: false, rangeDirty: false, duplicates: 0, candidateCount: 0, messages: [] };
+  const levels = { info: { name: '信息', color: '#16756f' }, warn: { name: '警告', color: '#b47d35' }, error: { name: '错误', color: '#b5524f' }, unknown: { name: '未归类', color: '#758499' } };
+  const stateNames = { disabled: '串口关闭', connecting: '连接中', waiting: '等待数据', connected: '已连接', stale: '数据过期', disconnected: '断开', suspended: '休眠', stopped: '程序停止', fatal_error: '后台异常', unknown: '未知' };
+  const stateColors = { disabled: '#c4cbd2', connecting: '#9baab7', waiting: '#aec6cf', connected: '#16756f', stale: '#c49a56', disconnected: '#b5756e', suspended: '#a4a1bc', stopped: '#d5d9de', fatal_error: '#b5524f', unknown: '#e3e7eb' };
+  const categoryNames = { connection: '连接状态', interval: '回传间隔操作', rx_rejected: '接收校验提示', fault: '原始故障码变化', startup: '程序启动', shutdown: '程序退出', fatal: '后台异常' };
+  const charts = { activity: new D.Chart('log-activity-chart'), category: new D.Chart('log-category-chart'), timeline: new D.Chart('log-state-chart') };
+  const create = (tag, value, className) => { const node = document.createElement(tag); if (value !== undefined) node.textContent = value; if (className) node.className = className; return node; };
+  const hasCategory = key => Object.prototype.hasOwnProperty.call(categoryNames, key);
+  const labelKey = key => !key ? '未识别条目' : (hasCategory(key) ? categoryNames[key] : (key.startsWith('storage_') ? '存储状态 · ' + key.slice(8) : key));
+  const finiteTime = value => typeof value === 'number' && Number.isFinite(value);
+  const displayTime = value => finiteTime(value) ? D.time(value, state.utc, true) : '无可识别时间';
+  function addMessage(message) { state.messages.push(message); if (state.messages.length > 100) state.messages.shift(); }
+  function getRange() {
+    const start = D.parseInput(D.el('log-start').value, state.utc);
+    const end = D.parseInput(D.el('log-end').value, state.utc);
+    return { start: finiteTime(start) ? start : null, end: finiteTime(end) ? end : null, valid: !(finiteTime(start) && finiteTime(end) && start >= end) };
+  }
+  function severity(key, message, parsed) {
+    if (!parsed) return 'unknown';
+    if (/已恢复|恢复正常|记录状态已恢复/.test(message) && key.startsWith('storage_')) return 'info';
+    if (key === 'fatal' || /fatal_error/.test(message)) return 'error';
+    if (key.startsWith('storage_') && key.endsWith('_error')) return 'error';
+    if (key === 'fault' || key === 'rx_rejected') return 'warn';
+    if (/错误|失败|超时|不足|无法|无权限|被占用|不可用/.test(message)) return 'error';
+    if (key === 'connection' && /^(disconnected|stale)(?:[:\s]|$)/.test(message)) return 'warn';
+    if (key === 'interval' && /未确认|丢弃|取消|未发送/.test(message)) return 'warn';
+    return 'info';
+  }
+  function rawHash(value) {
+    let a = 2166136261, b = 2246822519;
+    for (let i = 0; i < value.length; i++) { const n = value.charCodeAt(i); a = Math.imul(a ^ n, 16777619); b = Math.imul(b ^ n, 3266489917); }
+    return (a >>> 0).toString(36) + ':' + (b >>> 0).toString(36);
+  }
+  function strictTimestamp(value) {
+    const m = /^(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:\.\d+)?(?:Z|[+-]\d\d:\d\d)$/.exec(value);
+    if (!m) return null;
+    const y = Number(m[1]), month = Number(m[2]), day = Number(m[3]);
+    if (month < 1 || month > 12 || day < 1 || day > new Date(Date.UTC(y, month, 0)).getUTCDate() || Number(m[4]) > 23 || Number(m[5]) > 59 || Number(m[6]) > 59) return null;
+    const time = Date.parse(value); return Number.isFinite(time) ? time : null;
+  }
+  async function parseLog(text, source) {
+    text = text.replace(/^\uFEFF/, '');
+    const entries = [], info = { unknown: 0, continuations: 0, blanks: 0, backwards: 0, largeRepeats: 0 };
+    const finalEmpty = /[\r\n]$/.test(text), separator = /\r\n|\n|\r/g;
+    let previous = null, previousTime = null, cursor = 0, lineNumber = 0;
+    while (cursor < text.length) {
+      const found = separator.exec(text), end = found ? found.index : text.length;
+      const line = text.slice(cursor, end); cursor = found ? separator.lastIndex : text.length; lineNumber++;
+      if (!line.trim()) info.blanks++;
+      else {
+        const match = /^(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?(?:Z|[+-]\d\d:\d\d))\s+DM-Agent\s+\[([^\]\r\n]{1,128})\]\s?(.*)$/.exec(line);
+        const time = match ? strictTimestamp(match[1]) : null;
+        if (!match && previous && previous.parsed && /^[\t ]/.test(line)) {
+          previous.message += '\n' + line; previous.raw += '\n' + line; previous.lineEnd = lineNumber; previous.continuations++; info.continuations++;
+        } else {
+          const parsed = !!match && time !== null;
+          const event = { sourceId: source.id, sourceName: source.name, line: lineNumber, lineEnd: lineNumber, time: parsed ? time : null, stamp: match ? match[1] : '', key: parsed ? match[2] : '', message: parsed ? match[3] : line, raw: line, parsed, continuations: 0, partialTail: false, order: state.order++ };
+          if (!parsed) info.unknown++;
+          if (parsed && previousTime !== null && time < previousTime) info.backwards++;
+          if (parsed) previousTime = time;
+          entries.push(event); previous = event;
+        }
+      }
+      if (entries.length > MAX_EVENTS) throw new Error('文件事件数超过 10 万条，未导入此文件');
+      if (lineNumber % 2000 === 0) { D.text('log-drop-subtitle', '解析 ' + source.name + ' · 第 ' + D.integer(lineNumber) + ' 行'); await D.nextFrame(); }
+    }
+    if (!finalEmpty && previous && previous.lineEnd === lineNumber && text.length) previous.partialTail = true;
+    const occurrences = new Map();
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i];
+      const repeated = /(?:\(|（)合并重复\s+(\d+)\s*次(?:\)|）)\s*$/.exec(entry.message);
+      entry.reportedSuppressed = 0;
+      entry.baseMessage = entry.message;
+      if (repeated) {
+        const count = Number(repeated[1]);
+        if (Number.isSafeInteger(count) && count >= 0) entry.reportedSuppressed = count; else info.largeRepeats++;
+        entry.baseMessage = entry.message.slice(0, repeated.index).trimEnd();
+      }
+      entry.level = severity(entry.key, entry.baseMessage, entry.parsed);
+      const count = (occurrences.get(entry.raw) || 0) + 1;
+      occurrences.set(entry.raw, count); entry.ordinal = count; entry.hash = rawHash(entry.raw.length > 65536 ? entry.raw.slice(0, 32768) + ':' + entry.raw.length + ':' + entry.raw.slice(-32768) : entry.raw);
+      if (i && i % 2500 === 0) await D.nextFrame();
+    }
+    return { entries, info };
+  }
+  function setBusy(busy) {
+    state.busy = busy;
+    D.el('log-file-input').disabled = busy; D.el('log-import').disabled = busy;
+    D.el('log-export').disabled = busy || !state.filtered.length;
+    for (const button of D.el('log-file-list').querySelectorAll('button')) button.disabled = busy;
+    D.el('log-clear').disabled = busy || !state.files.length;
+    D.el('log-drop').setAttribute('aria-disabled', busy ? 'true' : 'false');
+    D.text('log-drop-title', busy ? '正在读取本地日志…' : '将运行日志拖到这里，或点击选择文件');
+    if (!busy) D.text('log-drop-subtitle', '支持追加多个文件。每个最多 32 MiB，总计 64 MiB、10 万条事件；已导入 ' + D.integer(state.files.length) + ' 个文件。');
+  }
+  async function importFiles(fileList) {
+    if (state.busy) return;
+    const selected = Array.from(fileList || []);
+    if (!selected.length) return;
+    setBusy(true);
+    let added = 0, rejected = 0;
+    try {
+      for (let i = 0; i < selected.length; i++) {
+        const file = selected[i];
+        if (state.files.length >= MAX_FILES) { rejected++; addMessage(file.name + '：来源文件数已达 128 个，请清空或移除部分文件'); continue; }
+        if (file.size > MAX_FILE) { rejected++; addMessage(file.name + '：超过单文件 32 MiB 限制'); continue; }
+        const bytes = state.files.reduce((sum, item) => sum + item.size, 0);
+        if (bytes + file.size > MAX_TOTAL) { rejected++; addMessage(file.name + '：导入后将超过总计 64 MiB 限制'); continue; }
+        try {
+          D.text('log-drop-subtitle', '读取 ' + (i + 1) + ' / ' + selected.length + ' · ' + file.name);
+          const decoded = await D.readText(file);
+          const source = { id: 'f' + state.nextId++, name: file.name, size: file.size, modified: file.lastModified, encoding: decoded.encoding };
+          const parsed = await parseLog(decoded.text, source);
+          if (state.records.length + parsed.entries.length > MAX_EVENTS) throw new Error('导入后将超过总计 10 万条事件；未截断或部分导入此文件');
+          source.count = parsed.entries.length; source.info = parsed.info;
+          const combined = state.records.concat(parsed.entries); state.files.push(source); state.records = combined; added++;
+          if (parsed.info.unknown) addMessage(file.name + '：保留 ' + parsed.info.unknown + ' 条未识别格式或时间的条目');
+          if (parsed.info.continuations) addMessage(file.name + '：' + parsed.info.continuations + ' 个前导空白续行附到前一条事件');
+          if (parsed.info.backwards) addMessage(file.name + '：检测到 ' + parsed.info.backwards + ' 处时间回退，图表按日志时间排序');
+          if (parsed.info.blanks) addMessage(file.name + '：' + parsed.info.blanks + ' 个空白行未计为事件');
+          if (parsed.entries.some(entry => entry.partialTail)) addMessage(file.name + '：末行未以换行结束，已保留并标记，可能是不完整写入');
+          if (parsed.info.largeRepeats) addMessage(file.name + '：合并计数超出安全整数范围，保留原文但未累加该计数');
+        } catch (error) { rejected++; addMessage(file.name + '：' + (error && error.message ? error.message : String(error))); }
+        await D.nextFrame();
+      }
+      sortRecords(); renderSources(); updateSelectors();
+      if (!state.rangeDirty) setFullRange();
+      state.page = 1; render();
+      const note = '已导入 ' + added + ' 个文件；未导入 ' + rejected + ' 个。' + (state.rangeDirty ? '保留当前时间筛选。' : '') + ' 文件解析说明可在页面底部展开。';
+      showNotice(note, rejected ? 'warn' : 'info');
+    } finally { D.el('log-file-input').value = ''; setBusy(false); renderWarnings(); }
+  }
+  function sortRecords() {
+    state.records.sort((a, b) => {
+      if (a.time === null && b.time !== null) return 1;
+      if (b.time === null && a.time !== null) return -1;
+      return ((a.time || 0) - (b.time || 0)) || a.order - b.order;
+    });
+  }
+  function rebuildBase() {
+    state.duplicates = 0;
+    const source = D.el('log-source').value;
+    const candidates = source ? state.records.filter(entry => entry.sourceId === source) : state.records;
+    state.candidateCount = candidates.length;
+    if (!D.el('log-dedupe').checked) { state.base = candidates.slice(); return; }
+    const seen = new Map(); const result = [];
+    for (const entry of candidates) {
+      const key = entry.hash + ':' + entry.ordinal;
+      const matches = seen.get(key) || [];
+      if (matches.some(old => old.raw === entry.raw)) { state.duplicates++; continue; }
+      matches.push(entry); seen.set(key, matches); result.push(entry);
+    }
+    state.base = result;
+  }
+  function renderSources() {
+    const host = D.el('log-file-list'); host.replaceChildren();
+    D.text('log-file-count', state.files.length);
+    if (!state.files.length) host.append(create('p', '尚未导入文件', 'muted small'));
+    for (const file of state.files) {
+      const item = create('div', undefined, 'file-item');
+      const content = create('div'); const title = create('strong', file.name + '（' + file.id + '）', 'small'); title.title = file.name;
+      content.append(title, create('div', D.integer(file.count) + ' 条 · ' + D.bytes(file.size) + ' · ' + file.encoding, 'muted small'));
+      const remove = create('button', '移除', 'button quiet small'); remove.type = 'button'; remove.setAttribute('aria-label', '移除 ' + file.name);
+      remove.disabled = state.busy;
+      remove.addEventListener('click', () => {
+        if (state.busy) return;
+        state.files = state.files.filter(value => value.id !== file.id);
+        state.records = state.records.filter(value => value.sourceId !== file.id);
+        renderSources(); updateSelectors(); if (!state.rangeDirty) setFullRange(); state.page = 1; closeDetail(); render(); setBusy(false);
+      });
+      item.append(content, remove); host.append(item);
+    }
+  }
+  function updateSelectors() {
+    const source = D.el('log-source'), key = D.el('log-key');
+    const selectedSource = state.files.some(file => file.id === source.value) ? source.value : '';
+    D.fillSelect(source, [{ value: '', label: '全部文件' }].concat(state.files.map(file => ({ value: file.id, label: file.name + ' · ' + D.integer(file.count) + ' 条（' + file.id + '）' }))), selectedSource);
+    const keys = Array.from(new Set(state.records.filter(entry => entry.parsed).map(entry => entry.key))).sort((a, b) => a.localeCompare(b));
+    const options = [{ value: '', label: '全部类型' }].concat(keys.map(value => ({ value: 'key:' + value, label: labelKey(value) + (hasCategory(value) ? ' [' + value + ']' : '') })));
+    if (state.records.some(entry => !entry.parsed)) options.push({ value: '@unknown', label: '未识别条目' });
+    const selectedKey = options.some(option => option.value === key.value) ? key.value : '';
+    D.fillSelect(key, options, selectedKey);
+  }
+  function fullExtent(rows) {
+    let min = null, max = null;
+    for (const entry of rows) if (finiteTime(entry.time)) { if (min === null || entry.time < min) min = entry.time; if (max === null || entry.time > max) max = entry.time; }
+    return { min, max };
+  }
+  function setFullRange() {
+    const extent = fullExtent(state.records);
+    D.el('log-start').value = extent.min === null ? '' : D.inputTime(Math.floor(extent.min / 60000) * 60000, state.utc);
+    D.el('log-end').value = extent.max === null ? '' : D.inputTime((Math.floor(extent.max / 60000) + 1) * 60000, state.utc);
+  }
+  function renderWarnings() {
+    const list = D.el('log-import-warnings'); list.replaceChildren();
+    const notes = state.messages.length ? state.messages : [state.files.length ? '已按原格式导入；没有额外的文件解析提示。' : '尚未导入文件。'];
+    for (const note of notes) list.append(create('li', note));
+  }
+  function filterRows() {
+    rebuildBase();
+    const range = getRange();
+    if (!range.valid) return { rows: [], range };
+    const source = D.el('log-source').value, key = D.el('log-key').value, level = D.el('log-level').value;
+    const query = D.el('log-query').value.trim().toLocaleLowerCase();
+    const includeUnknown = D.el('log-unknown').checked;
+    const rows = state.base.filter(entry => {
+      if (source && entry.sourceId !== source) return false;
+      if (entry.time === null) { if (!includeUnknown) return false; }
+      else if ((range.start !== null && entry.time < range.start) || (range.end !== null && entry.time >= range.end)) return false;
+      if (key === '@unknown' && entry.parsed) return false;
+      if (key.startsWith('key:') && entry.key !== key.slice(4)) return false;
+      if (level && entry.level !== level) return false;
+      return !query || (entry.raw + ' ' + entry.sourceName).toLocaleLowerCase().includes(query);
+    });
+    return { rows, range };
+  }
+  function render() {
+    const result = filterRows(); state.filtered = result.rows;
+    const loaded = state.files.length > 0, rows = result.rows;
+    let errors = 0, warnings = 0, connection = 0, suppressed = 0, noTime = 0, suppressedOverflow = false;
+    for (const entry of rows) {
+      if (entry.level === 'error') errors++;
+      if (entry.level === 'warn') warnings++;
+      if (entry.key === 'connection') connection++;
+      if (entry.time === null) noTime++;
+      if (suppressed <= Number.MAX_SAFE_INTEGER - entry.reportedSuppressed) suppressed += entry.reportedSuppressed; else suppressedOverflow = true;
+    }
+    D.text('log-stat-total', loaded ? D.integer(rows.length) : '—');
+    D.text('log-stat-issues', loaded ? D.integer(errors) + ' / ' + D.integer(warnings) : '—');
+    D.text('log-stat-connection', loaded ? D.integer(connection) : '—');
+    D.text('log-stat-suppressed', loaded ? (suppressedOverflow ? '超出安全范围' : D.integer(suppressed)) : '—');
+    D.text('log-stat-total-note', loaded ? '其中无时间 ' + D.integer(noTime) + ' 条；续行不另计' : '导入后统计');
+    D.text('log-filter-summary', !result.range.valid ? '开始时间必须早于结束时间，请调整筛选。' : '选中来源 ' + D.integer(state.candidateCount) + ' 条；跨文件合并 ' + D.integer(state.duplicates) + ' 条；筛选 ' + D.integer(rows.length) + ' 条。等级由规则推断。');
+    D.el('log-filter-summary').classList.toggle('error', !result.range.valid);
+    D.el('log-export').disabled = !rows.length || state.busy;
+    renderActivity(rows); renderCategories(rows); renderTimeline(result.range); renderProblems(rows); renderTable();
+    D.el('log-clear').disabled = state.busy || !loaded;
+  }
+  function renderActivity(rows) {
+    const timed = rows.filter(entry => entry.time !== null);
+    if (!timed.length) { charts.activity.set({ type: 'histogram', title: '事件时间分布', unit: '条', bars: [], emptyText: '导入有时间的日志条目后显示' }); D.text('log-activity-note', '无时间条目仍保留在明细中，不分配到时间柱。'); return; }
+    const extent = fullExtent(timed), span = Math.max(1, extent.max - extent.min);
+    const sizes = [60000, 300000, 900000, 3600000, 21600000, 86400000, 604800000, 2592000000, 31536000000];
+    let size = Math.max(sizes[sizes.length - 1], Math.ceil(span / 60)); for (const value of sizes) if (span / value <= 60) { size = value; break; }
+    const start = Math.floor(extent.min / size) * size, buckets = new Map();
+    for (const entry of timed) {
+      const index = Math.floor((entry.time - start) / size);
+      if (!buckets.has(index)) buckets.set(index, { info: 0, warn: 0, error: 0, unknown: 0 });
+      buckets.get(index)[entry.level]++;
+    }
+    const count = Math.floor((extent.max - start) / size) + 1, bars = [];
+    for (let i = 0; i < count; i++) {
+      const bucket = buckets.get(i) || { info: 0, warn: 0, error: 0, unknown: 0 }, time = start + i * size;
+      const parts = ['info', 'warn', 'error', 'unknown'].map(level => ({ name: levels[level].name, value: bucket[level], color: levels[level].color }));
+      bars.push({ label: D.tickTime(time, state.utc, span > 86400000), value: parts.reduce((sum, part) => sum + part.value, 0), parts, note: D.time(time, state.utc, true) + ' 至 ' + D.time(time + size, state.utc, true) + '；合并报告次数未计入' });
+    }
+    charts.activity.set({ type: 'histogram', title: '事件时间分布', unit: '条', bars, zero: true });
+    D.text('log-activity-note', '每柱 ' + D.duration(size) + '；按可识别时间条目计数，续行及合并次数不加权。');
+  }
+  function renderCategories(rows) {
+    const counts = new Map();
+    for (const entry of rows) { const key = entry.parsed ? entry.key : ''; counts.set(key, (counts.get(key) || 0) + 1); }
+    const bars = Array.from(counts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(pair => ({ label: labelKey(pair[0]), value: pair[1], note: pair[0] ? '[' + pair[0] + '] · ' + D.integer(pair[1]) + ' 条' : '未识别格式或时间，原文保留' }));
+    charts.category.set({ type: 'bars', title: '事件类别', unit: '条', bars, emptyText: '暂无筛选结果' });
+  }
+  function eventState(entry) {
+    if (!entry.parsed) return null;
+    if (entry.key === 'startup') return 'unknown';
+    if (entry.key === 'shutdown') return 'stopped';
+    if (entry.key === 'fatal') return 'fatal_error';
+    if (entry.key !== 'connection') return null;
+    const m = /^(disabled|connecting|waiting|connected|stale|disconnected|suspended|stopped|fatal_error)(?:[:\s]|$)/.exec(entry.message);
+    return m ? m[1] : 'unknown';
+  }
+  function renderTimeline(range) {
+    const source = D.el('log-source').value;
+    const context = state.base.filter(entry => entry.time !== null && (!source || entry.sourceId === source));
+    const extent = fullExtent(context);
+    if (!range.valid || extent.min === null || extent.max <= extent.min) { charts.timeline.set({ type: 'timeline', title: '连接状态记录', intervals: [], emptyText: '至少需要两个不同时间的条目形成状态摘要' }); return; }
+    const min = range.start === null ? extent.min : Math.max(extent.min, range.start);
+    const max = range.end === null ? extent.max : Math.min(extent.max, range.end);
+    if (max <= min) { charts.timeline.set({ type: 'timeline', title: '连接状态记录', intervals: [], emptyText: '当前时间范围没有可形成区间的日志' }); return; }
+    const intervals = [];
+    let current = 'unknown', from = extent.min;
+    const push = end => {
+      const start = Math.max(from, min), stop = Math.min(end, max);
+      if (stop > start) intervals.push({ start, end: stop, label: stateNames[current], color: stateColors[current], meta: '事件延续摘要；不是实测在线时长。末次日志后不外推。' });
+    };
+    for (const entry of context) {
+      const next = eventState(entry);
+      if (next === null) continue;
+      push(entry.time); from = entry.time; current = next;
+      if (from > max) break;
+    }
+    if (from < max) push(max);
+    charts.timeline.set({ type: 'timeline', title: '连接状态记录', utc: state.utc, xmin: min, xmax: max, intervals, emptyText: '当前范围无状态记录' });
+  }
+  function renderProblems(rows) {
+    const groups = new Map();
+    for (const entry of rows) {
+      if (entry.level !== 'error' && entry.level !== 'warn') continue;
+      const key = JSON.stringify([entry.key, entry.baseMessage]), current = groups.get(key);
+      if (current) {
+        current.count++;
+        if (entry.time !== null) { if (current.first === null || entry.time < current.first) current.first = entry.time; if (current.last === null || entry.time > current.last) current.last = entry.time; }
+      } else groups.set(key, { key: entry.key, message: entry.baseMessage, count: 1, first: entry.time, last: entry.time, level: entry.level });
+    }
+    const sorted = Array.from(groups.values()).sort((a, b) => b.count - a.count || (b.last || 0) - (a.last || 0)).slice(0, 12);
+    const body = D.el('log-problem-body'); body.replaceChildren();
+    if (!sorted.length) { const tr = create('tr'), td = create('td', state.files.length ? '当前筛选未发现规则归类的错误或警告。' : '导入日志后显示关注事件。', 'muted'); td.colSpan = 4; tr.append(td); body.append(tr); return; }
+    for (const group of sorted) {
+      const tr = create('tr'), label = create('td'); label.append(create('div', '[' + group.key + ']', 'log-key'), create('span', levels[group.level].name + ' · 规则', 'badge ' + (group.level === 'error' ? 'badge-error' : 'badge-warn')));
+      const message = create('td', group.message.length > 280 ? group.message.slice(0, 280) + '…' : group.message, 'log-problem'); message.title = group.message.slice(0, 2000);
+      const dates = create('td'); dates.append(create('div', displayTime(group.first)), create('div', displayTime(group.last), 'muted small'));
+      tr.append(label, message, create('td', D.integer(group.count)), dates); body.append(tr);
+    }
+  }
+  function renderTable() {
+    const rows = state.filtered, pages = Math.max(1, Math.ceil(rows.length / state.pageSize));
+    state.page = Math.min(Math.max(1, state.page), pages);
+    const start = (state.page - 1) * state.pageSize, body = D.el('log-table-body'); body.replaceChildren();
+    if (!rows.length) { const tr = create('tr'), td = create('td', state.files.length ? '没有符合筛选条件的条目。无时间条目可通过上方选项保留。' : '请选择运行日志；文件不会上传或自动读取。', 'muted'); td.colSpan = 5; tr.append(td); body.append(tr); }
+    for (const entry of rows.slice(start, start + state.pageSize)) {
+      const tr = create('tr');
+      const time = create('td'); time.append(create('div', displayTime(entry.time)));
+      if (entry.stamp) time.append(create('div', entry.stamp, 'muted small'));
+      if (entry.partialTail) time.append(create('span', '末行无换行', 'badge badge-warn'));
+      const level = create('td'); level.append(create('span', levels[entry.level].name + (entry.level === 'unknown' ? '' : ' · 规则'), 'badge ' + (entry.level === 'error' ? 'badge-error' : entry.level === 'warn' ? 'badge-warn' : entry.level === 'info' ? 'badge-ok' : '')));
+      const source = create('td'); source.append(create('div', entry.key ? '[' + entry.key + ']' : '未识别条目', 'log-key'), create('div', entry.sourceName + ' · 行 ' + entry.line + (entry.lineEnd !== entry.line ? '–' + entry.lineEnd : ''), 'log-source'));
+      const message = create('td', entry.message.length > 350 ? entry.message.slice(0, 350) + '…' : entry.message, 'log-message'); message.title = '点击“查看”读取完整原文';
+      const action = create('td', undefined, 'log-row-detail'), button = create('button', '查看', 'button quiet small'); button.type = 'button'; button.addEventListener('click', () => showDetail(entry)); action.append(button);
+      tr.append(time, level, source, message, action); body.append(tr);
+    }
+    D.text('log-page-info', rows.length ? (start + 1) + '–' + Math.min(start + state.pageSize, rows.length) + ' / ' + D.integer(rows.length) + ' 条 · ' + state.page + '/' + pages + ' 页' : '0 条');
+    D.el('log-prev').disabled = state.page <= 1; D.el('log-next').disabled = state.page >= pages;
+    D.text('log-table-note', '按日志时间排列；无时间条目在最后。每页最多 ' + state.pageSize + ' 条，完整原文保留在内存。');
+  }
+  function showDetail(entry) {
+    const host = D.el('log-detail-meta'); host.replaceChildren();
+    const pairs = [
+      ['来源文件', entry.sourceName + '（来源 ' + entry.sourceId + '）'], ['原始行号', entry.line + (entry.lineEnd !== entry.line ? '–' + entry.lineEnd : '')],
+      ['显示时间', displayTime(entry.time)], ['原始时间', entry.stamp || '无法识别'], ['事件 key', entry.key || '无法识别'],
+      ['推断等级', levels[entry.level].name + '（按事件名和关键字归类，源日志没有等级字段）'],
+      ['另报告合并', D.integer(entry.reportedSuppressed) + ' 次；对应此前该 key 的抑制消息，不能确定消息内容和时间'],
+      ['续行 / 尾行', entry.continuations + ' 个续行' + (entry.partialTail ? '；末行没有换行，可能不完整' : '')]
+    ];
+    for (const pair of pairs) host.append(create('dt', pair[0]), create('dd', pair[1]));
+    D.text('log-detail-raw', entry.raw.length > 65536 ? entry.raw.slice(0, 65536) + '\n\n… 预览仅显示前 65,536 个字符，完整内容保留在内存，可通过“导出筛选事件”获取。' : entry.raw); D.el('log-detail').hidden = false;
+    D.el('log-detail').scrollIntoView({ block: 'nearest', behavior: 'auto' });
+  }
+  function closeDetail() { D.el('log-detail').hidden = true; D.el('log-detail-meta').replaceChildren(); D.text('log-detail-raw', ''); }
+  function resetFilters() {
+    D.el('log-source').value = ''; D.el('log-key').value = ''; D.el('log-level').value = ''; D.el('log-query').value = '';
+    D.el('log-unknown').checked = true; state.rangeDirty = false; state.page = 1; setFullRange(); closeDetail(); render();
+  }
+  function clearAll() {
+    if (state.busy) return;
+    state.files = []; state.records = []; state.base = []; state.filtered = []; state.page = 1; state.rangeDirty = false; state.messages = []; state.duplicates = 0; state.candidateCount = 0;
+    D.el('log-file-input').value = ''; D.el('log-start').value = ''; D.el('log-end').value = ''; D.el('log-query').value = ''; D.el('log-level').value = '';
+    D.el('log-unknown').checked = true; closeDetail(); renderSources(); updateSelectors(); renderWarnings(); setBusy(false); showNotice(''); render();
+  }
+  D.el('log-import').addEventListener('click', () => { if (!state.busy) D.el('log-file-input').click(); });
+  D.el('log-file-input').addEventListener('change', event => importFiles(event.target.files));
+  D.el('log-clear').addEventListener('click', clearAll);
+  const drop = D.el('log-drop');
+  drop.addEventListener('click', () => { if (!state.busy) D.el('log-file-input').click(); });
+  drop.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.key === ' ') && !state.busy) { event.preventDefault(); D.el('log-file-input').click(); } });
+  drop.addEventListener('dragover', event => { event.preventDefault(); if (!state.busy) drop.classList.add('is-dragover'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('is-dragover'));
+  drop.addEventListener('drop', event => { event.preventDefault(); drop.classList.remove('is-dragover'); if (!state.busy) importFiles(event.dataTransfer.files); });
+  document.addEventListener('dragover', event => event.preventDefault());
+  document.addEventListener('drop', event => event.preventDefault());
+  for (const id of ['log-start', 'log-end']) D.el(id).addEventListener('change', () => { state.rangeDirty = true; state.page = 1; closeDetail(); render(); });
+  for (const id of ['log-source', 'log-key', 'log-level', 'log-unknown', 'log-dedupe']) D.el(id).addEventListener('change', () => { state.page = 1; closeDetail(); render(); });
+  D.el('log-query').addEventListener('input', D.debounce(() => { state.page = 1; closeDetail(); render(); }));
+  D.el('log-zone').addEventListener('change', () => {
+    const before = getRange(); state.utc = D.el('log-zone').value === 'utc';
+    if (before.start !== null) D.el('log-start').value = D.inputTime(before.start, state.utc);
+    if (before.end !== null) D.el('log-end').value = D.inputTime(before.end, state.utc);
+    closeDetail(); render();
+  });
+  D.el('log-reset').addEventListener('click', resetFilters);
+  D.el('log-page-size').addEventListener('change', () => { state.pageSize = Number(D.el('log-page-size').value); state.page = 1; renderTable(); });
+  D.el('log-prev').addEventListener('click', () => { state.page--; renderTable(); });
+  D.el('log-next').addEventListener('click', () => { state.page++; renderTable(); });
+  D.el('log-detail-close').addEventListener('click', closeDetail);
+  D.el('log-export').addEventListener('click', () => {
+    if (!state.filtered.length) return;
+    const content = '\uFEFF' + state.filtered.map(entry => entry.raw.replace(/\n/g, '\r\n')).join('\r\n') + '\r\n';
+    D.download(content, 'dm-agent_filtered.log', 'text/plain;charset=utf-8');
+  });
+  renderSources(); renderWarnings(); render();
+})();
+
+</script>
+<script>
+(() => {
+  'use strict';
+  const views = ['csv', 'logs'];
+  const tabs = views.map(view => document.getElementById('tab-' + view));
+  const tablist = document.getElementById('record-tabs');
+  const compact = window.matchMedia('(max-width:820px)');
+  let active = null;
+  const readView = () => views.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'csv';
+  function orientation() { tablist.setAttribute('aria-orientation', compact.matches ? 'horizontal' : 'vertical'); }
+  function activate(view, updateHash = false) {
+    if (!views.includes(view)) view = 'csv';
+    const changed = active !== view;
+    if (changed) {
+      const dialog = document.getElementById('record-dialog');
+      if (dialog.open && view !== 'csv') dialog.close();
+    }
+    for (let i = 0; i < views.length; i++) {
+      const selected = views[i] === view;
+      document.getElementById(views[i] + '-view').hidden = !selected;
+      document.getElementById(views[i] + '-sources').hidden = !selected;
+      tabs[i].classList.toggle('is-active', selected);
+      tabs[i].setAttribute('aria-selected', String(selected));
+      tabs[i].tabIndex = selected ? 0 : -1;
+    }
+    active = view;
+    if (updateHash && location.hash !== '#' + view) location.hash = view;
+    if (changed) {
+      if (document.activeElement && document.activeElement.closest('main[hidden]')) tabs[views.indexOf(view)].focus({ preventScroll: true });
+      window.scrollTo(0, 0);
+      // ResizeObserver redraws visible charts; this also supports the resize-event fallback.
+      requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+    }
+  }
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => activate(views[index], true));
+    tab.addEventListener('keydown', event => {
+      let next = index;
+      if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = tabs.length - 1;
+      else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % tabs.length;
+      else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index + tabs.length - 1) % tabs.length;
+      else return;
+      event.preventDefault();
+      activate(views[next], true);
+      tabs[next].focus({ preventScroll: true });
+    });
+  });
+  window.addEventListener('hashchange', () => activate(readView()));
+  if (compact.addEventListener) compact.addEventListener('change', orientation); else compact.addListener(orientation);
+  orientation();
+  activate(readView());
+})();
+
+</script>
+</body>
+</html>

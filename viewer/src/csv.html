@@ -1,0 +1,95 @@
+<!--DM_PART:STYLE-->
+<style>
+.csv-range-actions{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.csv-record-note{max-width:75ch}
+.csv-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 20px}.csv-facts div{min-width:0}.csv-facts dt{color:var(--muted,#65717d);font-size:12px}.csv-facts dd{margin:4px 0 0;overflow-wrap:anywhere;font-size:13px}
+.csv-dialog{width:min(900px,calc(100vw - 40px));max-height:85vh;border:1px solid #dbe1e5;border-radius:16px;padding:24px;color:#17212b;background:#fff}.csv-dialog::backdrop{background:#14242b70}.csv-dialog-head{display:flex;justify-content:space-between;align-items:start;gap:16px;margin-bottom:20px}.csv-dialog h2{margin:0;font-size:20px}
+.csv-import-diagnostics{padding:16px 20px;margin:12px 0;background:#fff;border:1px solid #e0e5e8;border-radius:12px}.csv-import-diagnostics ul{max-height:220px;overflow:auto;padding-left:20px;font-size:13px;line-height:1.8}.csv-quality{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.csv-top-help{font-size:12px;line-height:1.7;max-width:75ch}.csv-compact-select{max-width:160px}.csv-file-meta{display:block;font-size:11px;color:#74808a;margin-top:3px}.csv-empty-cell{text-align:center;padding:30px!important;color:#74808a}.csv-dialog .table-wrap{max-height:45vh}.csv-stat-value-row{display:flex;align-items:baseline;gap:6px}
+.csv-energy{margin:18px 0 22px}.csv-energy .stats-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin:14px 0}.csv-energy .filters{background:#f8fbfa}.csv-energy-charts{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;margin:16px 0}.csv-energy .card{margin-top:0}.csv-energy-asof{margin:6px 0 0;color:#647b82;font-size:12px;line-height:1.7;overflow-wrap:anywhere}.csv-energy details{padding:12px 0 0}.csv-energy details .table-wrap{margin-top:12px;max-height:420px}.csv-energy-separator{margin:26px 0 14px;font-size:15px;color:#355360}.csv-energy .stat-value{font-size:27px}.csv-energy-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:#6e818b}.csv-energy-legend span{display:inline-flex;align-items:center;gap:5px}.csv-energy-legend i{width:7px;height:7px;border-radius:50%;display:inline-block}
+@media(max-width:1000px){.csv-energy-charts{grid-template-columns:1fr}}
+@media(max-width:640px){.csv-energy .stats-grid{grid-template-columns:1fr}.csv-energy .stat-value{font-size:25px}.csv-facts{grid-template-columns:1fr}.csv-dialog{padding:18px}}
+</style>
+<!--/DM_PART:STYLE-->
+
+<!--DM_PART:SIDEBAR-->
+<section class="sidebar-section"><h2 class="small">已导入文件</h2><p id="file-summary" class="muted small">尚未导入 CSV</p><ul id="file-list" class="file-list"></ul></section>
+<!--/DM_PART:SIDEBAR-->
+
+<!--DM_PART:MAIN-->
+<header class="topbar">
+    <div><div class="eyebrow">CSV / TELEMETRY</div><h1 class="page-title">电源运行回看</h1><p class="lede">查看分钟运行记录，以及按自然日／月汇总的估算用电。</p></div>
+    <div class="actions"><button id="import-button" class="button primary" type="button">导入 CSV</button><button id="clear-button" class="button quiet" type="button" disabled>清空</button></div>
+  </header>
+  <input id="file-input" class="sr-only" type="file" tabindex="-1" accept=".csv,text/csv" multiple aria-label="选择一份或多份遥测 CSV">
+  <div id="drop-zone" class="import-zone" role="button" tabindex="0" aria-label="选择或拖入 CSV 文件">
+    <strong id="import-title">拖入每日 CSV，或点击选择文件</strong>
+    <span class="muted small">可追加多个日期；按记录主键去重。单文件 32 MiB，合计 96 MiB，最多 100,000 条采样＋50,000 条电量汇总。</span>
+  </div>
+  <div id="csv-notice" class="notice info" role="status" aria-live="polite" hidden></div>
+  <details id="import-diagnostics" class="csv-import-diagnostics" hidden><summary id="diagnostics-title">导入诊断</summary><ul id="diagnostics-list"></ul></details>
+  <section class="card csv-energy" aria-labelledby="energy-heading">
+    <div class="card-head"><div><h2 id="energy-heading" class="card-title">耗电统计</h2><p class="card-subtitle">导入最新一天的新版 CSV，即可读取携带的本月逐日和历史逐月汇总。</p><p id="energy-asof" class="csv-energy-asof">尚无可用电量数据</p></div></div>
+    <div class="filters" aria-label="耗电统计筛选">
+      <label class="field field-wide">电量设备／来源<select id="energy-scope" disabled><option value="">尚无电量记录</option></select></label>
+      <label class="field">逐日统计月份<select id="energy-month" disabled><option value="">尚无月份</option></select></label>
+      <label class="field">逐月统计年份<select id="energy-year" disabled><option value="">尚无年份</option></select></label>
+      <button id="energy-export" class="button quiet" type="button" disabled>导出电量 CSV</button>
+    </div>
+    <div class="stats-grid">
+      <article class="stat-card"><div class="stat-label">统计日估算用电</div><div class="csv-stat-value-row"><strong id="energy-today" class="stat-value">—</strong><span class="stat-unit">kWh</span></div><div id="energy-today-note" class="stat-meta">以 CSV 统计日为准</div></article>
+      <article class="stat-card"><div class="stat-label">所选月估算用电</div><div class="csv-stat-value-row"><strong id="energy-month-total" class="stat-value">—</strong><span class="stat-unit">kWh</span></div><div id="energy-month-note" class="stat-meta">按本地自然月汇总</div></article>
+      <article class="stat-card"><div class="stat-label">所选年估算用电</div><div class="csv-stat-value-row"><strong id="energy-year-total" class="stat-value">—</strong><span class="stat-unit">kWh</span></div><div id="energy-year-note" class="stat-meta">按自然年各月累计</div></article>
+    </div>
+    <p id="energy-note" class="help" aria-live="polite">复用每分钟平均输入功率与有效时长估算。空白不填零，切换年月不会改变分钟趋势筛选。</p>
+    <div class="csv-energy-legend"><span><i style="background:#3f799d"></i>已结算估算</span><span><i style="background:#16756f"></i>当前期间累计</span><span><i style="background:#b47d35"></i>恢复不完整</span><span>真实 0 显示基线圆点；缺失留空</span></div>
+    <div class="csv-energy-charts">
+      <article class="card"><div class="card-head"><div><h3 class="card-title">自然月每日用电</h3><p class="card-subtitle">当前月最多 31 日；跨月后，最新文件携带上月合计。</p></div></div><div id="energy-days-chart" class="chart-host" aria-label="自然月每日估算用电柱状图"></div></article>
+      <article class="card"><div class="card-head"><div><h3 class="card-title">自然年每月用电</h3><p class="card-subtitle">按年份区分历史月份，当前月继续累计。</p></div></div><div id="energy-months-chart" class="chart-host" aria-label="自然年每月估算用电柱状图"></div></article>
+    </div>
+    <details><summary>展开日／月汇总明细</summary><div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">统计期间</th><th scope="col">估算电量 kWh</th><th scope="col">有效覆盖</th><th scope="col">状态</th><th scope="col">截至／来源</th></tr></thead><tbody id="energy-table-body"><tr><td colspan="5">导入 CSV 后查看日／月汇总</td></tr></tbody></table></div></details>
+    <p class="help">1 kWh＝1 度电。统计期间沿用 CSV 的本地日期；已结算仅表示期间结束，不表示完整监测了全天。最新电量 CSV 导出包含所选来源的完整快照与累计，不受下方分钟筛选影响。</p>
+  </section>
+  <h2 class="csv-energy-separator">分钟运行记录</h2>
+  <section class="filters" aria-label="数据筛选">
+    <label class="field field-wide">设备身份<select id="device-filter" disabled><option value="*">尚无记录</option></select></label>
+    <label class="field field-wide">运行／设备会话<select id="session-filter" disabled><option value="*">所有会话</option></select></label>
+    <label class="field">时间显示<select id="timezone-filter"><option value="local">本机时间</option><option value="utc">UTC</option></select></label>
+    <label class="field">起始分钟<input id="range-start" type="datetime-local" step="60" disabled></label>
+    <label class="field">结束分钟<input id="range-end" type="datetime-local" step="60" disabled></label>
+    <div class="csv-range-actions"><button id="apply-range" class="button" type="button" disabled>应用时间</button><button id="all-range" class="button quiet" type="button" disabled>全部时间</button><button id="export-button" class="button quiet" type="button" disabled>导出分钟筛选</button></div>
+  </section>
+  <p class="help csv-record-note">按记录区间起点筛选，包含结束分钟内的记录；统计保留完整记录，不对分钟内部插值。不同设备身份不自动合并。</p>
+  <section class="stats-grid" aria-label="功率统计">
+    <article class="stat-card"><div class="stat-label">时间加权输入功率</div><div class="csv-stat-value-row"><strong id="kpi-power" class="stat-value">—</strong><span class="stat-unit">W</span></div><div id="kpi-power-note" class="stat-meta">按有效覆盖时长加权</div></article>
+    <article class="stat-card"><div class="stat-label">观测输入功率峰值</div><div class="csv-stat-value-row"><strong id="kpi-peak" class="stat-value">—</strong><span class="stat-unit">W</span></div><div class="stat-meta">记录中已观察的最大值</div></article>
+    <article class="stat-card"><div class="stat-label">所选分钟估算电量</div><div class="csv-stat-value-row"><strong id="kpi-energy" class="stat-value">—</strong><span class="stat-unit">Wh</span></div><div id="kpi-energy-note" class="stat-meta">仅积分已覆盖数据</div></article>
+    <article class="stat-card"><div class="stat-label">有效功率记录时长</div><strong id="kpi-duration" class="stat-value">—</strong><div id="kpi-duration-note" class="stat-meta">不将缺失时段填零</div></article>
+  </section>
+  <p id="analysis-note" class="help" aria-live="polite">导入后展示统计；空值不会作为 0，风扇 0 RPM 会保留。</p>
+  <div id="quality-summary" class="csv-quality" aria-label="记录质量摘要"></div>
+  <section class="chart-grid" aria-label="遥测图表">
+    <article class="card span-2"><div class="card-head"><div><h2 class="card-title">输入功率趋势</h2><p class="card-subtitle">记录均值与观测最小／最大范围，缺口处断开。</p></div></div><div id="power-chart" class="chart-host chart-tall" aria-label="输入功率趋势图"></div></article>
+    <article class="card"><div class="card-head"><div><h2 class="card-title">三处温度</h2><p class="card-subtitle">低压侧、高压区和环境分开显示。</p></div></div><div id="temperature-chart" class="chart-host" aria-label="温度趋势图"></div></article>
+    <article class="card"><div class="card-head"><div><h2 class="card-title">风扇转速</h2><p class="card-subtitle">阶梯线表示记录均值；0 RPM 是有效读数。</p></div></div><div id="fan-chart" class="chart-host" aria-label="风扇转速阶梯图"></div></article>
+    <article class="card"><div class="card-head"><div><h2 class="card-title">四路电压</h2><p class="card-subtitle">相对标称值便于比较小幅波动，不作为合格判定。</p></div><label class="field small">显示方式<select id="rail-mode" class="csv-compact-select"><option value="percent">标称偏移 %</option><option value="volts">实测 V</option></select></label></div><div id="rails-chart" class="chart-host" aria-label="四路电压趋势图"></div></article>
+    <article class="card"><div class="card-head"><div><h2 class="card-title">输入电压与频率</h2><p class="card-subtitle">各自使用实际单位，避免双轴混淆。</p></div><label class="field small">指标<select id="mains-mode" class="csv-compact-select"><option value="voltage">输入电压 V</option><option value="frequency">输入频率 Hz</option></select></label></div><div id="mains-chart" class="chart-host" aria-label="输入电气参数趋势图"></div></article>
+    <article class="card"><div class="card-head"><div><h2 class="card-title">负载分布</h2><p class="card-subtitle">按记录均值分箱，以有效覆盖分钟数加权。</p></div></div><div id="distribution-chart" class="chart-host" aria-label="功率分布柱状图"></div></article>
+    <article class="card"><div class="card-head"><div><h2 class="card-title">记录状态摘要</h2><p class="card-subtitle">来自区间摘要字段，不代表精确在线时间；空档为未记录。</p></div></div><div id="state-chart" class="chart-host" aria-label="记录状态摘要时间带"></div></article>
+  </section>
+  <section class="card" aria-labelledby="records-heading">
+    <div class="card-head"><div><h2 id="records-heading" class="card-title">记录明细</h2><p id="table-summary" class="card-subtitle">尚无记录</p></div><div class="actions"><label class="field small">明细标记<select id="quality-filter"><option value="all">全部记录</option><option value="issue">非连接／缺失／故障</option><option value="partial">部分区间</option><option value="fault">观察到非零故障码</option></select></label><label class="field small">搜索<input id="record-search" type="search" placeholder="设备、会话、来源或原因" maxlength="200"></label></div></div>
+    <p class="help">明细标记与搜索只影响本表；图表和统计仍使用上方筛选。点击“详情”查看全部指标及来源。</p>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">区间起点</th><th scope="col">输入功率 W</th><th scope="col">风扇 RPM</th><th scope="col">低压 ℃</th><th scope="col">输入 V</th><th scope="col">功率有效秒</th><th scope="col">状态／标记</th><th scope="col">来源</th><th scope="col">操作</th></tr></thead><tbody id="records-body"><tr><td class="csv-empty-cell" colspan="9">导入 CSV 后查看记录</td></tr></tbody></table></div>
+    <div class="pagination"><button id="previous-page" class="button quiet" type="button" disabled>上一页</button><span id="page-label" class="small muted">第 0 / 0 页</span><button id="next-page" class="button quiet" type="button" disabled>下一页</button><label class="field small">每页<select id="page-size"><option value="25">25 条</option><option value="50" selected>50 条</option><option value="100">100 条</option></select></label></div>
+  </section>
+  <p class="footer-note">曲线是记录均值的可视化，并非原始瞬时采样。部分区间、重启和时间缺口会保留；源文件不会被改写。</p>
+<!--/DM_PART:MAIN-->
+
+<!--DM_PART:OVERLAY-->
+<dialog id="record-dialog" class="csv-dialog">
+  <div class="csv-dialog-head"><div><div class="eyebrow">RECORD DETAIL</div><h2>区间记录详情</h2></div><button id="close-dialog" class="button quiet" type="button" aria-label="关闭记录详情">关闭</button></div>
+  <dl id="record-facts" class="csv-facts"></dl>
+  <div class="table-wrap"><table class="data-table metric-table"><thead><tr><th scope="col">指标</th><th scope="col">均值</th><th scope="col">最小</th><th scope="col">最大</th><th scope="col">末值</th><th scope="col">有效秒</th></tr></thead><tbody id="metric-details"></tbody></table></div>
+  <p class="help">有效时长为区间内累计值，缺失的具体位置未知。原始 CSV 中的空值显示为 —，不会补 0。</p>
+  <details><summary class="small">原始字段</summary><div class="table-wrap"><table class="data-table"><tbody id="raw-details"></tbody></table></div></details>
+</dialog>
+<!--/DM_PART:OVERLAY-->

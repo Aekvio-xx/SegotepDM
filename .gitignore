@@ -1,0 +1,40 @@
+# Project-local toolchain and native build outputs
+/.tools/
+/out/
+/build/
+/dist/
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/install_manifest.txt
+**/compile_commands.json
+
+# Runtime state and records
+**/config/
+**/data/
+**/logs/
+
+# Native and packaging artifacts
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.exe
+*.dll
+*.zip
+*.7z
+*.vsix
+*.nupkg
+
+# Editors and temporary files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.tmp
+*.bak
+~*
+
+# viewer/dist intentionally remains versioned.

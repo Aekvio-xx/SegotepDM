@@ -1,0 +1,96 @@
+<!--DM_PART:STYLE-->
+<style>
+.log-message{white-space:pre-wrap;overflow-wrap:anywhere;max-width:640px;line-height:1.6}
+.log-raw{margin:0;padding:18px;background:#f6f8fa;border:1px solid #e4e9ed;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.75 Consolas,"Cascadia Mono",monospace;max-height:420px;overflow:auto}
+.log-key{font:12px/1.5 Consolas,monospace;color:#52616f;overflow-wrap:anywhere}
+.log-source{font-size:12px;color:#70808c;overflow-wrap:anywhere}
+.log-problem{max-width:430px;white-space:pre-wrap;overflow-wrap:anywhere}
+.log-rule-note{display:flex;gap:12px;flex-wrap:wrap}
+.log-rule-note span{display:inline-flex;align-items:center;gap:6px}
+.log-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.log-detail-meta{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px 14px;margin:0 0 18px;font-size:13px}
+.log-detail-meta dt{color:#70808c}
+.log-detail-meta dd{margin:0;overflow-wrap:anywhere}
+.log-warning-list{margin:8px 0 0;padding-left:21px;font-size:12px;color:#7b6549;line-height:1.8}
+.log-query{min-width:210px}
+.log-row-detail{white-space:nowrap}
+@media(max-width:700px){.log-detail-meta{grid-template-columns:80px minmax(0,1fr)}.log-query{min-width:0}}
+</style>
+<!--/DM_PART:STYLE-->
+
+<!--DM_PART:SIDEBAR-->
+<section class="sidebar-section" aria-labelledby="log-files-heading">
+    <div class="card-head"><h2 id="log-files-heading" class="small">导入文件</h2><span id="log-file-count" class="badge">0</span></div>
+    <div id="log-file-list" class="file-list"><p class="muted small">尚未导入文件</p></div>
+  </section>
+<!--/DM_PART:SIDEBAR-->
+
+<!--DM_PART:MAIN-->
+<header class="topbar">
+    <div><p class="eyebrow">DM AGENT / LOCAL RECORDS</p><h1 class="page-title">运行日志</h1><p class="lede">按时间回看连接变化、记录异常与操作事件。</p></div>
+    <div class="actions"><button type="button" id="log-import" class="button primary">导入日志</button><button type="button" id="log-clear" class="button quiet" disabled>清空</button></div>
+  </header>
+  <input id="log-file-input" class="sr-only" tabindex="-1" type="file" accept=".log,.txt,text/plain" multiple aria-label="选择日志文件">
+  <div id="log-notice" class="notice" role="status" aria-live="polite" hidden></div>
+  <section id="log-drop" class="import-zone" role="button" tabindex="0" aria-label="点击或拖入日志文件">
+    <strong id="log-drop-title">将运行日志拖到这里，或点击选择文件</strong>
+    <p id="log-drop-subtitle">支持多个 .log / .txt 文件。每个文件最多 32 MiB，总计最多 64 MiB、10 万条事件。</p>
+  </section>
+  <section class="filters" aria-label="日志筛选">
+    <label class="field"><span>开始时间（含）</span><input id="log-start" type="datetime-local" step="60"></label>
+    <label class="field"><span>结束时间（不含）</span><input id="log-end" type="datetime-local" step="60"></label>
+    <label class="field"><span>时间显示</span><select id="log-zone"><option value="local">本机时间</option><option value="utc">UTC</option></select></label>
+    <label class="field"><span>来源文件</span><select id="log-source"><option value="">全部文件</option></select></label>
+    <label class="field"><span>事件类型</span><select id="log-key"><option value="">全部类型</option></select></label>
+    <label class="field"><span>推断等级</span><select id="log-level"><option value="">全部等级</option><option value="error">错误（规则）</option><option value="warn">警告（规则）</option><option value="info">信息（规则）</option><option value="unknown">未归类</option></select></label>
+    <label class="field field-wide log-query"><span>关键字</span><input id="log-query" type="search" placeholder="搜索内容、事件或文件名"></label>
+    <button id="log-reset" type="button" class="button quiet">重置筛选</button>
+  </section>
+  <div class="actions small">
+    <label class="check"><input id="log-dedupe" type="checkbox" checked> 合并跨文件相同条目，保留同一文件内的重复</label>
+    <label class="check"><input id="log-unknown" type="checkbox" checked> 保留无时间条目</label>
+    <span id="log-filter-summary" class="muted">等级由事件名和关键字归类，原日志不含正式等级。</span>
+  </div>
+  <div class="stats-grid">
+    <section class="stat-card"><p class="stat-label">筛选条目</p><div id="log-stat-total" class="stat-value">—</div><p id="log-stat-total-note" class="stat-meta">导入后统计</p></section>
+    <section class="stat-card"><p class="stat-label">错误 / 警告 · 规则归类</p><div id="log-stat-issues" class="stat-value">—</div><p class="stat-meta">按原有条目计数，不代表设备故障次数</p></section>
+    <section class="stat-card"><p class="stat-label">连接类事件</p><div id="log-stat-connection" class="stat-value">—</div><p class="stat-meta">来自 connection 事件</p></section>
+    <section class="stat-card"><p class="stat-label">另报告合并次数</p><div id="log-stat-suppressed" class="stat-value">—</div><p class="stat-meta">属该 key 此前抑制消息，具体时间未知</p></section>
+  </div>
+  <div class="chart-grid">
+    <section class="card span-2">
+      <div class="card-head"><div><h2 class="card-title">事件时间分布</h2><p class="card-subtitle" id="log-activity-note">每个可识别时间条目记一次，续行及合并次数不加权。</p></div></div>
+      <div class="log-rule-note small"><span><i class="log-dot" style="background:#16756f"></i>信息</span><span><i class="log-dot" style="background:#b47d35"></i>警告</span><span><i class="log-dot" style="background:#b5524f"></i>错误</span></div>
+      <div id="log-activity-chart" class="chart-host chart-tall" aria-label="事件时间分布柱状图"></div>
+    </section>
+    <section class="card">
+      <div class="card-head"><div><h2 class="card-title">事件类别</h2><p class="card-subtitle">当前筛选下的条目数量，最多展示前 10 类。</p></div></div>
+      <div id="log-category-chart" class="chart-host" aria-label="事件类别条形图"></div>
+    </section>
+    <section class="card">
+      <div class="card-head"><div><h2 class="card-title">连接状态记录</h2><p class="card-subtitle">仅受时间与来源筛选影响；按事件延续的摘要，不能当作实测在线率。</p></div></div>
+      <div id="log-state-chart" class="chart-host" aria-label="连接状态摘要时间带"></div>
+      <p class="help">首条状态事件前及无法解释的连接事件标为未知；缺失日志不能自动识别，末次日志后不外推。跨文件按日志时间排序，独立运行日志建议按来源筛选，时钟回拨可能改变事件先后。</p>
+    </section>
+    <section class="card span-2">
+      <div class="card-head"><div><h2 class="card-title">重复问题与关注事件</h2><p class="card-subtitle">按 key 与当前消息文本归组；仅统计错误 / 警告条目，不把“合并重复”附给当前消息。</p></div></div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>事件</th><th>内容</th><th>条目数</th><th>首次 / 末次</th></tr></thead><tbody id="log-problem-body"></tbody></table></div>
+    </section>
+  </div>
+  <section class="card">
+    <div class="card-head"><div><h2 class="card-title">日志明细</h2><p class="card-subtitle" id="log-table-note">导入日志后显示；未知条目保留原文。</p></div><button id="log-export" type="button" class="button quiet" disabled>导出筛选事件</button></div>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>时间</th><th>推断等级</th><th>事件 / 来源</th><th>内容</th><th>原文</th></tr></thead><tbody id="log-table-body"></tbody></table></div>
+    <div class="pagination"><div class="actions"><label class="field"><span class="sr-only">每页条数</span><select id="log-page-size"><option value="50">每页 50 条</option><option value="100">每页 100 条</option></select></label><span id="log-page-info" class="muted">0 条</span></div><div class="actions"><button id="log-prev" type="button" class="button quiet" disabled>上一页</button><button id="log-next" type="button" class="button quiet" disabled>下一页</button></div></div>
+  </section>
+  <section id="log-detail" class="card" hidden aria-labelledby="log-detail-title">
+    <div class="card-head"><h2 id="log-detail-title" class="card-title">原始事件</h2><button id="log-detail-close" type="button" class="button quiet">收起</button></div>
+    <dl id="log-detail-meta" class="log-detail-meta"></dl>
+    <pre id="log-detail-raw" class="log-raw"></pre>
+  </section>
+  <details class="card small" id="log-import-info"><summary>导入规则与文件说明</summary><p class="help">每次导入都读取实际内容，不以同名或修改时间判断重复；来源编号区分同名文件。跨文件去重按相同原文及该条原文在文件内的出现次序匹配，可取消勾选恢复全部条目。无时间条目不受时间筛选限制，单独保留；前导空白续行附在上一条完整事件后。日志中的“合并重复 N 次”只作独立报告，不推断其对应消息或发生时间。rx_rejected 条目数不是坏帧数量，原始故障码也不解码。</p><ul id="log-import-warnings" class="log-warning-list"><li>尚未导入文件。</li></ul></details>
+  <p class="footer-note">纯离线读取 · 不上传文件 · 不连接 DM Agent 或设备 · 清空或关闭页面后重新导入</p>
+<!--/DM_PART:MAIN-->
+
+<!--DM_PART:OVERLAY-->
+
+<!--/DM_PART:OVERLAY-->

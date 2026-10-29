@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "local-agent-x64",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/agent-x64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/dist/DM-Agent-x64"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "release-agent-x64",
+      "configurePreset": "local-agent-x64"
+    }
+  ]
+}

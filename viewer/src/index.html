@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="color-scheme" content="light">
+<title>DM 记录查看器 · CSV 与运行日志</title>
+<!--DM_COMMON_STYLE-->
+<style>
+.nav-link[role=tab]{width:100%;border:0;background:transparent;text-align:left;font-family:inherit;cursor:pointer}
+.nav-link[role=tab].is-active{color:var(--accent);background:var(--accent-soft)}
+.nav-link[role=tab]:hover:not(.is-active){background:#eef2f4;color:var(--ink)}
+.source-panel{display:contents}
+@media(max-width:820px){.nav-link[role=tab]{width:auto}}
+</style>
+<!--DM_CSV_STYLE-->
+<!--DM_LOG_STYLE-->
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">DM</span><div><strong>记录查看器</strong><div class="brand-caption">本地记录 · 离线分析</div></div></div>
+    <nav id="record-tabs" class="nav" role="tablist" aria-label="记录类型" aria-orientation="vertical">
+      <button id="tab-csv" class="nav-link is-active" type="button" role="tab" data-view="csv" aria-controls="csv-view" aria-selected="true" tabindex="0">CSV 数据趋势</button>
+      <button id="tab-logs" class="nav-link" type="button" role="tab" data-view="logs" aria-controls="logs-view" aria-selected="false" tabindex="-1">运行日志</button>
+    </nav>
+    <div id="csv-sources" class="source-panel">
+<!--DM_CSV_SIDEBAR-->
+    </div>
+    <div id="logs-sources" class="source-panel" hidden>
+<!--DM_LOG_SIDEBAR-->
+    </div>
+    <p class="sidebar-note">文件只在本页内存处理，不上传或改写原件。切换保留两类记录；刷新或关闭后需重新导入。</p>
+  </aside>
+  <main id="csv-view" class="main" role="tabpanel" aria-labelledby="tab-csv" tabindex="0">
+<!--DM_CSV_MAIN-->
+  </main>
+  <main id="logs-view" class="main" role="tabpanel" aria-labelledby="tab-logs" tabindex="0" hidden>
+<!--DM_LOG_MAIN-->
+  </main>
+</div>
+<!--DM_CSV_OVERLAY-->
+<!--DM_LOG_OVERLAY-->
+<!--DM_COMMON_SCRIPT-->
+<!--DM_CSV_SCRIPT-->
+<!--DM_LOG_SCRIPT-->
+<!--DM_NAV_SCRIPT-->
+</body>
+</html>
